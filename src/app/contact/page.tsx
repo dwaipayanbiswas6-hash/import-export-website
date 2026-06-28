@@ -1,0 +1,7 @@
+'use client';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Section } from '@/components/ui';
+const schema = z.object({ name: z.string().min(2), email: z.string().email(), message: z.string().min(10) });
+type FormData = z.infer<typeof schema>;
+export default function Contact(){ const { register, handleSubmit, setError, formState:{errors,isSubmitting}, reset } = useForm<FormData>(); function onSubmit(data:FormData){ const result=schema.safeParse(data); if(!result.success){ result.error.issues.forEach(issue=>setError(issue.path[0] as keyof FormData,{message:issue.message})); return; } reset(); } return <Section eyebrow="Contact" title="Plan your next international move."><form onSubmit={handleSubmit(onSubmit)} className="mt-10 grid max-w-3xl gap-5 rounded-[2rem] border border-black/10 bg-[color:var(--card)] p-8 shadow-xl"><input className="rounded-2xl border bg-transparent p-4" placeholder="Name" {...register('name')}/>{errors.name&&<p>{errors.name.message}</p>}<input className="rounded-2xl border bg-transparent p-4" placeholder="Email" {...register('email')}/>{errors.email&&<p>{errors.email.message}</p>}<textarea className="min-h-40 rounded-2xl border bg-transparent p-4" placeholder="Tell us about your lane, product, and timeline" {...register('message')}/>{errors.message&&<p>{errors.message.message}</p>}<button disabled={isSubmitting} className="rounded-full bg-[color:var(--navy)] px-7 py-4 font-semibold text-white disabled:opacity-60">{isSubmitting?'Sending…':'Request consultation'}</button></form></Section>}

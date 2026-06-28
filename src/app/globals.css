@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f3ec;
+  --foreground: #15120d;
+  --card: #fffaf2;
+  --muted: #6f675b;
+  --gold: #b88939;
+  --navy: #081525;
+}
+
+.dark {
+  --background: #07111f;
+  --foreground: #f8efe0;
+  --card: #0d1b2d;
+  --muted: #b5aa9a;
+  --gold: #d6a854;
+  --navy: #030812;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-playfair), Georgia, serif;
+}
+
+::selection {
+  background: var(--gold);
+  color: #081525;
+}
+
+.glass {
+  background: color-mix(in srgb, var(--card) 84%, transparent);
+  backdrop-filter: blur(18px);
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
