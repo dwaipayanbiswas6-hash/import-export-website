@@ -13,7 +13,7 @@ const routes = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://aurextrade.example';
+  const baseUrl = 'https://biswasexports.com';
 
   return routes.map((route) => ({
     url: `${baseUrl}${route}`,

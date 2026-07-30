@@ -1,4 +1,4 @@
-# AurexTrade Global Frontend
+# Biswas Exports Frontend
 
 Enterprise-grade Phase 1 frontend for a modern import and export company, built with Next.js App Router, React, TypeScript, Tailwind CSS, Framer Motion, Lucide Icons, React Hook Form, and Zod.
 
