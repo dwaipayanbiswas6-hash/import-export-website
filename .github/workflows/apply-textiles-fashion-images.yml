@@ -1,0 +1,168 @@
+name: Apply Textiles and Fashion images
+
+on:
+  push:
+    branches:
+      - fix/textiles-fashion-images
+    paths:
+      - .github/workflows/apply-textiles-fashion-images.yml
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/textiles-fashion-images
+          fetch-depth: 0
+
+      - name: Connect images to catalogue
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          products_path = Path('src/lib/products.ts')
+          text = products_path.read_text(encoding='utf-8')
+
+          textile_map = """const textilesFashionImages: Record<
+            string,
+            { image: string; imageAlt: string }
+          > = {
+            'cotton-garments': {
+              image: '/images/products/cotton-garments.webp',
+              imageAlt: 'Folded cotton garments in soft earthy colours on a wooden table',
+            },
+            't-shirts': {
+              image: '/images/products/t-shirts.webp',
+              imageAlt: 'Stack of plain cotton T-shirts in white, grey, olive and navy',
+            },
+            'denim-fabric-garments': {
+              image: '/images/products/denim-fabric-garments.webp',
+              imageAlt: 'Folded blue denim jeans beside coordinated denim fabric rolls',
+            },
+            'home-textiles': {
+              image: '/images/products/home-textiles.webp',
+              imageAlt: 'Coordinated cushions, throws and folded woven home textiles',
+            },
+            'bed-sheets': {
+              image: '/images/products/bed-sheets.webp',
+              imageAlt: 'Neatly made bed with neutral striped bed sheets and pillows',
+            },
+            towels: {
+              image: '/images/products/towels.webp',
+              imageAlt: 'Stack of plush towels in white, beige, blue and charcoal',
+            },
+            'plant-fibre-carpets-rugs': {
+              image: '/images/products/plant-fibre-carpets-rugs.webp',
+              imageAlt: 'Woven plant-fibre rugs with natural and geometric patterns',
+            },
+          };
+          """
+
+          marker = '/** Catalogue governance:'
+          if 'const textilesFashionImages:' not in text:
+              if marker not in text:
+                  raise SystemExit('Catalogue marker not found')
+              text = text.replace(marker, textile_map + '\n' + marker, 1)
+
+          old_chain = """  const productImage =
+            foodAndAgricultureImages[seed.slug] ??
+            processedVegetarianFoodImages[seed.slug];"""
+          new_chain = """  const productImage =
+            foodAndAgricultureImages[seed.slug] ??
+            processedVegetarianFoodImages[seed.slug] ??
+            textilesFashionImages[seed.slug];"""
+          if old_chain in text:
+              text = text.replace(old_chain, new_chain, 1)
+          elif new_chain not in text:
+              raise SystemExit('Product image lookup block not found')
+
+          products_path.write_text(text, encoding='utf-8')
+
+          Path('IMAGE_SOURCES.md').write_text(
+              """# Product image sources and licensing
+
+The 18 Food & Agriculture, 10 Processed Vegetarian Food and 7 Textiles &
+Fashion WebP visuals under `public/images/products/` were AI-generated with
+OpenAI specifically for the Biswas Exports catalogue.
+
+These 35 images are illustrative catalogue visuals. They must not be
+described as photographs of actual Biswas Exports inventory, suppliers,
+farms, factories, packaging or shipments.
+
+The remaining 52 catalogue products continue to use original neutral SVG
+illustrations generated specifically for the Biswas Exports project.
+
+No third-party marketplace photographs, supplier logos, watermarks or
+external copyrighted images are used.
+
+Preserve the existing 4:3 image aspect ratio when replacing catalogue
+visuals.
+""",
+              encoding='utf-8',
+          )
+
+          for slug in [
+              'cotton-garments',
+              't-shirts',
+              'denim-fabric-garments',
+              'home-textiles',
+              'bed-sheets',
+              'towels',
+              'plant-fibre-carpets-rugs',
+          ]:
+              svg = Path(f'public/images/products/{slug}.svg')
+              if svg.exists():
+                  svg.unlink()
+          PY
+
+      - name: Verify uploaded images
+        run: |
+          for file in \
+            cotton-garments.webp \
+            t-shirts.webp \
+            denim-fabric-garments.webp \
+            home-textiles.webp \
+            bed-sheets.webp \
+            towels.webp \
+            plant-fibre-carpets-rugs.webp; do
+            test -f "public/images/products/$file"
+          done
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Format changed text files
+        run: npx prettier --write src/lib/products.ts IMAGE_SOURCES.md
+
+      - name: Validate catalogue
+        run: npm run catalogue:validate
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting of changed files
+        run: npx prettier --check src/lib/products.ts IMAGE_SOURCES.md
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit integrated catalogue changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/products.ts IMAGE_SOURCES.md
+          git add -u public/images/products
+          if git diff --cached --quiet; then
+            echo "No catalogue changes to commit"
+            exit 0
+          fi
+          git commit -m "Use Textiles and Fashion catalogue images"
+          git push origin HEAD:fix/textiles-fashion-images
