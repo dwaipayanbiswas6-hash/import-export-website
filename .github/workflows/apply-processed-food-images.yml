@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - fix/processed-vegetarian-food-images
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 permissions:
   contents: write
