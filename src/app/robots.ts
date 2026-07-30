@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://aurextrade.example/sitemap.xml',
+    sitemap: 'https://biswasexports.com/sitemap.xml',
   };
 }
