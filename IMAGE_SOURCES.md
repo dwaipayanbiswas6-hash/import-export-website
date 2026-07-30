@@ -1,5 +1,18 @@
 # Product image sources and licensing
 
-All 87 catalogue visuals under `public/images/products/` are original neutral SVG illustrations generated specifically for the Biswas Exports project. They do not incorporate third-party photographs, marketplace imagery, supplier logos, watermarks, or external copyrighted assets.
+The 18 Food & Agriculture WebP visuals under `public/images/products/`
+were AI-generated with OpenAI specifically for the Biswas Exports
+catalogue.
 
-Each illustration is product-specific by file name, embedded title, visible product label, and accessible alt text in the catalogue data. These neutral visuals should be replaced only with accurately representative images for which the business has documented usage rights. Preserve the existing 4:3 aspect ratio where practical.
+These images are illustrative catalogue visuals. They must not be
+described as photographs of actual Biswas Exports inventory, suppliers,
+farms, packaging or shipments.
+
+The remaining 69 catalogue products continue to use original neutral SVG
+illustrations generated specifically for the Biswas Exports project.
+
+No third-party marketplace photographs, supplier logos, watermarks or
+external copyrighted images are used.
+
+Preserve the existing 4:3 image aspect ratio when replacing catalogue
+visuals.
