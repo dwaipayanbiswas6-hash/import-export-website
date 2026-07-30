@@ -805,7 +805,7 @@ const foodAndAgricultureImages: Record<
 /** Catalogue governance: MOQ must be confirmed before quotation; packaging is specification-dependent; certifications must not be claimed without documentary proof; regulated products require destination-specific verification. */
 export const products: Product[] = seeds.map((seed) => {
   const profile = profiles[seed.category];
-  const productImage = foodAndAgricutureImages[seed.slug];
+  const productImage = foodAndAgricultureImages[seed.slug];
   return {
     ...seed,
     shortDescription: `India-origin ${seed.name.toLowerCase()} sourcing for ${profile.buyers}.`,
