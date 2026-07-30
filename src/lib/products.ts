@@ -802,10 +802,59 @@ const foodAndAgricultureImages: Record<
     imageAlt: 'Shelled groundnuts with groundnut pods',
   },
 };
+const processedVegetarianFoodImages: Record<
+  string,
+  { image: string; imageAlt: string }
+> = {
+  pickles: {
+    image: '/images/products/pickles.webp',
+    imageAlt:
+      'Spiced Indian mango pickle in a ceramic jar on a rustic wooden table',
+  },
+  papad: {
+    image: '/images/products/papad.webp',
+    imageAlt: 'Stack of crisp papad on a woven tray over a wooden table',
+  },
+  'instant-vegetarian-mixes': {
+    image: '/images/products/instant-vegetarian-mixes.webp',
+    imageAlt: 'Prepared savoury instant vegetarian mix in a wooden bowl',
+  },
+  'vegetarian-biscuits': {
+    image: '/images/products/vegetarian-biscuits.webp',
+    imageAlt: 'Round golden vegetarian biscuits in a ceramic bowl',
+  },
+  namkeen: {
+    image: '/images/products/namkeen.webp',
+    imageAlt: 'Traditional Indian namkeen mixture in a wooden bowl',
+  },
+  'ready-to-eat-vegan-curries': {
+    image: '/images/products/ready-to-eat-vegan-curries.webp',
+    imageAlt: 'Ready-to-eat chickpea vegan curry in a rustic bowl',
+  },
+  'fruit-juice-concentrates': {
+    image: '/images/products/fruit-juice-concentrates.webp',
+    imageAlt: 'Orange fruit juice concentrate in a bottle and serving bowl',
+  },
+  'coconut-products': {
+    image: '/images/products/coconut-products.webp',
+    imageAlt: 'Fresh coconut with coconut milk and desiccated coconut',
+  },
+  cashews: {
+    image: '/images/products/cashews.webp',
+    imageAlt: 'Whole cashew nuts in a wooden bowl on a rustic table',
+  },
+  raisins: {
+    image: '/images/products/raisins.webp',
+    imageAlt: 'Golden raisins in a wooden bowl on a rustic table',
+  },
+};
+
 /** Catalogue governance: MOQ must be confirmed before quotation; packaging is specification-dependent; certifications must not be claimed without documentary proof; regulated products require destination-specific verification. */
 export const products: Product[] = seeds.map((seed) => {
   const profile = profiles[seed.category];
-  const productImage = foodAndAgricultureImages[seed.slug];
+  const productImage =
+    foodAndAgricultureImages[seed.slug] ??
+    processedVegetarianFoodImages[seed.slug];
   return {
     ...seed,
     shortDescription: `India-origin ${seed.name.toLowerCase()} sourcing for ${profile.buyers}.`,

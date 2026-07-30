@@ -1,14 +1,14 @@
 # Product image sources and licensing
 
-The 18 Food & Agriculture WebP visuals under `public/images/products/`
-were AI-generated with OpenAI specifically for the Biswas Exports
-catalogue.
+The 18 Food & Agriculture and 10 Processed Vegetarian Food WebP
+visuals under `public/images/products/` were AI-generated with OpenAI
+specifically for the Biswas Exports catalogue.
 
-These images are illustrative catalogue visuals. They must not be
+These 28 images are illustrative catalogue visuals. They must not be
 described as photographs of actual Biswas Exports inventory, suppliers,
-farms, packaging or shipments.
+farms, factories, packaging or shipments.
 
-The remaining 69 catalogue products continue to use original neutral SVG
+The remaining 59 catalogue products continue to use original neutral SVG
 illustrations generated specifically for the Biswas Exports project.
 
 No third-party marketplace photographs, supplier logos, watermarks or
