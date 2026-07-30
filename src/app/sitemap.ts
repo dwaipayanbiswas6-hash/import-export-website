@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { getAllProductSlugs } from '@/lib/products';
 
 const routes = [
   '',
@@ -13,9 +14,12 @@ const routes = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://aurextrade.example';
+  const baseUrl = 'https://biswasexports.com';
 
-  return routes.map((route) => ({
+  return [
+    ...routes,
+    ...getAllProductSlugs().map((slug) => `/products/${slug}`),
+  ].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: route === '' ? 'weekly' : 'monthly',
