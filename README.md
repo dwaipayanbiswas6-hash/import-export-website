@@ -54,6 +54,25 @@ Never expose `RESEND_API_KEY` as a `NEXT_PUBLIC_` variable. Missing server-side
 email configuration produces a controlled service-unavailable response instead
 of displaying a false success state.
 
+## Product catalogue
+
+The complete catalogue source of truth is `src/lib/products.ts`. Product IDs and
+lowercase kebab-case slugs must remain unique. Add or edit a seed there, provide
+all buyer-facing fields through the typed profile architecture, and run
+`npm run catalogue:validate`; this checks the 87-product total, required fields,
+unique IDs and slugs, and all eight category totals.
+
+Product visuals live in `public/images/products/<slug>.svg`. Replace a visual
+only with an accurate, web-optimised asset for which usage rights are documented
+in `IMAGE_SOURCES.md`, then update the product image path and alt text. Product
+cards and detail pages use the central data rather than duplicate arrays.
+
+Request Quote links pass a product slug through `/contact?product=<slug>`. The
+Contact page validates that slug against the catalogue before prefilling its
+editable category and requirement fields; the existing client/server validation,
+honeypot, privacy consent, file controls, rate limiting, and Resend delivery
+remain unchanged.
+
 ## Phase 2 Recommendations
 
 Add CMS-backed content, customer portal authentication, shipment tracking integrations, multilingual routing, analytics dashboards, CRM form submission, and automated accessibility/performance monitoring.

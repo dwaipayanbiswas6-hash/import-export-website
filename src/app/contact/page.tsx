@@ -9,9 +9,14 @@ import {
   Phone,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { PageHero } from '@/components/ui';
+import {
+  getProductBySlug,
+  type ProductCategory as CatalogueCategory,
+} from '@/lib/products';
 import {
   contactSchema,
   incoterms,
@@ -29,7 +34,7 @@ const ACCEPTED_FILE_TYPES = [
   'image/jpeg',
 ];
 const inputClass =
-  'w-full rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3.5 font-normal shadow-sm outline-none transition duration-200 hover:border-[color:var(--gold-soft)] focus:border-[color:var(--gold)] focus:ring-2 focus:ring-[color:var(--gold-soft)]';
+  'w-full rounded-2xl border border-[color:var(--line)] bg-[color:var(--card)] px-4 py-3.5 font-normal shadow-sm outline-none transition duration-200 hover:border-[color:var(--gold-soft)] focus:border-[color:var(--gold)] focus:ring-2 focus:ring-[color:var(--gold-soft)]';
 const labelClass = 'grid gap-2 text-sm font-semibold';
 
 function configured(value: string | undefined) {
@@ -37,6 +42,16 @@ function configured(value: string | undefined) {
 }
 
 export default function Contact() {
+  return (
+    <Suspense fallback={<div className="min-h-screen" />}>
+      <ContactContent />
+    </Suspense>
+  );
+}
+
+function ContactContent() {
+  const searchParams = useSearchParams();
+  const selectedProduct = getProductBySlug(searchParams.get('product') ?? '');
   const [submissionState, setSubmissionState] =
     useState<SubmissionState>('idle');
   const [rfqFile, setRfqFile] = useState<File | null>(null);
@@ -60,6 +75,12 @@ export default function Contact() {
       website: '',
       incoterm: 'Not Decided',
       privacyConsent: false,
+      productCategory: selectedProduct
+        ? contactCategory(selectedProduct.category)
+        : undefined,
+      productRequirement: selectedProduct
+        ? `I would like to request a quotation for ${selectedProduct.name}. Please share available specifications, packaging options, MOQ, lead time, documentation, and commercial terms.`
+        : '',
     },
   });
 
@@ -229,7 +250,7 @@ export default function Contact() {
           <form
             noValidate
             onSubmit={handleSubmit(onSubmit)}
-            className="grid gap-8 rounded-[2rem] border border-[color:var(--line)] bg-white p-7 shadow-xl md:p-10"
+            className="grid gap-8 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--card)] p-7 shadow-xl md:p-10"
           >
             <div className="absolute -left-[10000px]" aria-hidden="true">
               <label htmlFor="website">Website</label>
@@ -528,6 +549,22 @@ export default function Contact() {
       </section>
     </>
   );
+}
+
+function contactCategory(
+  category: CatalogueCategory,
+): ContactFormData['productCategory'] {
+  if (category === 'Food & Agriculture') return 'Agricultural Products';
+  if (category === 'Textiles & Fashion') return 'Textiles & Apparel';
+  if (
+    category === 'Engineering & Industrial' ||
+    category === 'Electrical & Energy'
+  )
+    return 'Industrial Goods';
+  if (category === 'Home & Lifestyle') return 'Handicrafts & Home Décor';
+  if (category === 'Processed Vegetarian Food' || category === 'Packaging')
+    return 'Consumer Products';
+  return 'Custom Sourcing';
 }
 
 function ContactItem({

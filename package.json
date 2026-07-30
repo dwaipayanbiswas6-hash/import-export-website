@@ -14,6 +14,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "catalogue:validate": "tsc src/lib/products.ts --ignoreConfig --outDir .catalogue-check --module commonjs --target ES2020 --skipLibCheck && node scripts/validate-products.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

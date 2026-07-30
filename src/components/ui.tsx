@@ -130,7 +130,7 @@ export function Navbar() {
                   Products <ChevronDown size={14} />
                 </Link>
                 {mega && (
-                  <div className="absolute left-1/2 top-7 grid w-[620px] -translate-x-1/2 grid-cols-2 gap-2 rounded-3xl border border-[color:var(--line)] bg-white p-4 shadow-2xl">
+                  <div className="absolute left-1/2 top-7 grid w-[620px] -translate-x-1/2 grid-cols-2 gap-2 rounded-3xl border border-[color:var(--line)] bg-[color:var(--card)] p-4 shadow-2xl">
                     {products.map((product) => (
                       <Link
                         className="rounded-2xl p-4 transition hover:bg-[color:var(--cream)]"
@@ -166,7 +166,7 @@ export function Navbar() {
         </button>
       </nav>
       {open && (
-        <div className="border-t border-[color:var(--line)] bg-white px-6 py-5 lg:hidden">
+        <div className="border-t border-[color:var(--line)] bg-[color:var(--card)] px-6 py-5 lg:hidden">
           {navItems.map((item) => (
             <Link
               className="block border-b border-[color:var(--line)] py-3 text-lg"
