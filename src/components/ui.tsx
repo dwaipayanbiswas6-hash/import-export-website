@@ -1,34 +1,25 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import {
-  ArrowUp,
-  ChevronDown,
-  Globe,
-  Menu,
-  Moon,
-  Search,
-  Sun,
-  X,
-} from 'lucide-react';
+import { ArrowUp, ChevronDown, Menu, X } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { company, footerLinks, navItems, services } from '@/lib/data';
-
-type Children = { children: React.ReactNode };
+import { useState } from 'react';
+import { company, footerLinks, navItems, products } from '@/lib/data';
 
 export function Reveal({
   children,
   className = '',
-}: Children & { className?: string }) {
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   const reduce = useReducedMotion();
-
   return (
     <motion.div
       className={className}
       initial={reduce ? false : { opacity: 0, y: 24 }}
       transition={{ duration: 0.65, ease: 'easeOut' }}
-      viewport={{ once: true, margin: '-80px' }}
+      viewport={{ once: true, margin: '-60px' }}
       whileInView={reduce ? {} : { opacity: 1, y: 0 }}
     >
       {children}
@@ -39,125 +30,146 @@ export function Reveal({
 export function Section({
   eyebrow,
   title,
+  intro,
   children,
   id,
-}: Children & { eyebrow?: string; title: string; id?: string }) {
+  className = '',
+}: {
+  eyebrow?: string;
+  title: string;
+  intro?: string;
+  children: React.ReactNode;
+  id?: string;
+  className?: string;
+}) {
   return (
-    <section id={id} className="mx-auto max-w-7xl px-6 py-24 lg:px-8">
+    <section
+      id={id}
+      className={`mx-auto max-w-7xl px-6 py-24 lg:px-8 ${className}`}
+    >
       <Reveal>
-        {eyebrow ? (
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.28em] text-[color:var(--gold)]">
-            {eyebrow}
-          </p>
-        ) : null}
-        <h2 className="max-w-3xl text-4xl font-semibold tracking-tight md:text-6xl">
+        {eyebrow && <p className="eyebrow">{eyebrow}</p>}
+        <h2 className="max-w-4xl text-4xl font-semibold tracking-tight md:text-6xl">
           {title}
         </h2>
+        {intro && (
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-[color:var(--muted)]">
+            {intro}
+          </p>
+        )}
       </Reveal>
       {children}
     </section>
   );
 }
 
+export function PageHero({
+  eyebrow,
+  title,
+  intro,
+}: {
+  eyebrow: string;
+  title: string;
+  intro: string;
+}) {
+  return (
+    <section className="page-hero">
+      <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8 lg:py-28">
+        <Reveal>
+          <p className="eyebrow">{eyebrow}</p>
+          <h1 className="max-w-4xl text-5xl font-semibold leading-tight tracking-tight md:text-7xl">
+            {title}
+          </h1>
+          <p className="mt-7 max-w-2xl text-lg leading-8 text-[color:var(--muted)]">
+            {intro}
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+export function PremiumCard({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <Reveal className={`premium-card ${className}`}>{children}</Reveal>;
+}
+
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const [mega, setMega] = useState(false);
-  const [dark, setDark] = useState(false);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark);
-  }, [dark]);
-
   return (
-    <header className="glass sticky top-0 z-50 border-b border-black/10">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-        <Link className="font-display text-2xl font-bold tracking-tight" href="/">
-          Aurex<span className="text-[color:var(--gold)]">Trade</span>
+    <header className="glass sticky top-0 z-50 border-b border-[color:var(--line)]">
+      <nav
+        aria-label="Primary navigation"
+        className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8"
+      >
+        <Link
+          className="font-display text-2xl font-bold tracking-tight"
+          href="/"
+        >
+          Biswas <span className="text-[color:var(--gold)]">Exports</span>
         </Link>
-
         <div className="hidden items-center gap-7 lg:flex">
           {navItems.map((item) =>
-            item.label === 'Services' ? (
+            item.label === 'Products' ? (
               <div
                 className="relative"
-                key={item.label}
+                key={item.href}
                 onMouseEnter={() => setMega(true)}
                 onMouseLeave={() => setMega(false)}
               >
                 <Link
-                  className="flex items-center gap-1 text-sm font-medium hover:text-[color:var(--gold)]"
+                  className="nav-link flex items-center gap-1"
                   href={item.href}
                 >
-                  Services <ChevronDown size={14} />
+                  Products <ChevronDown size={14} />
                 </Link>
-                {mega ? (
-                  <div className="absolute left-1/2 top-7 grid w-[680px] -translate-x-1/2 grid-cols-2 gap-3 rounded-3xl border border-black/10 bg-[color:var(--card)] p-5 shadow-2xl">
-                    {services.map((service) => (
+                {mega && (
+                  <div className="absolute left-1/2 top-7 grid w-[620px] -translate-x-1/2 grid-cols-2 gap-2 rounded-3xl border border-[color:var(--line)] bg-white p-4 shadow-2xl">
+                    {products.map((product) => (
                       <Link
-                        className="rounded-2xl p-4 hover:bg-black/5"
-                        href="/services"
-                        key={service.title}
+                        className="rounded-2xl p-4 transition hover:bg-[color:var(--cream)]"
+                        href="/products"
+                        key={product.title}
                       >
-                        <b>{service.title}</b>
+                        <b>{product.title}</b>
                         <p className="mt-1 line-clamp-2 text-sm text-[color:var(--muted)]">
-                          {service.description}
+                          {product.description}
                         </p>
                       </Link>
                     ))}
                   </div>
-                ) : null}
+                )}
               </div>
             ) : (
-              <Link
-                className="text-sm font-medium hover:text-[color:var(--gold)]"
-                href={item.href}
-                key={item.href}
-              >
+              <Link className="nav-link" href={item.href} key={item.href}>
                 {item.label}
               </Link>
             ),
           )}
         </div>
-
-        <div className="hidden items-center gap-3 lg:flex">
-          <button aria-label="Search" className="focus-ring rounded-full border p-2">
-            <Search size={18} />
-          </button>
-          <button
-            aria-label="Language selector"
-            className="focus-ring rounded-full border p-2"
-          >
-            <Globe size={18} />
-          </button>
-          <button
-            aria-label="Toggle theme"
-            className="focus-ring rounded-full border p-2"
-            onClick={() => setDark(!dark)}
-          >
-            {dark ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
-          <Link
-            className="rounded-full bg-[color:var(--navy)] px-5 py-3 text-sm font-semibold text-white shadow-lg"
-            href="/contact"
-          >
-            Request Quote
-          </Link>
-        </div>
-
+        <Link className="button-primary hidden lg:inline-flex" href="/contact">
+          Request a quote
+        </Link>
         <button
-          aria-label="Open menu"
-          className="lg:hidden"
+          aria-expanded={open}
+          aria-label="Toggle navigation menu"
+          className="rounded-full border border-[color:var(--line)] p-2 lg:hidden"
           onClick={() => setOpen(!open)}
         >
           {open ? <X /> : <Menu />}
         </button>
       </nav>
-
-      {open ? (
-        <div className="border-t bg-[color:var(--card)] p-6 lg:hidden">
+      {open && (
+        <div className="border-t border-[color:var(--line)] bg-white px-6 py-5 lg:hidden">
           {navItems.map((item) => (
             <Link
-              className="block py-3 text-lg"
+              className="block border-b border-[color:var(--line)] py-3 text-lg"
               href={item.href}
               key={item.href}
               onClick={() => setOpen(false)}
@@ -165,31 +177,42 @@ export function Navbar() {
               {item.label}
             </Link>
           ))}
+          <Link
+            className="button-primary mt-5 inline-flex"
+            href="/contact"
+            onClick={() => setOpen(false)}
+          >
+            Request a quote
+          </Link>
         </div>
-      ) : null}
+      )}
     </header>
   );
 }
 
 export function Footer() {
   return (
-    <footer className="bg-[color:var(--navy)] text-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-16 md:grid-cols-5 lg:px-8">
+    <footer className="border-t border-[color:var(--gold-soft)] bg-[color:var(--cream)]">
+      <div className="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-5 lg:px-8">
         <div className="md:col-span-2">
-          <div className="font-display text-3xl font-bold">
-            Aurex<span className="text-[color:var(--gold)]">Trade</span>
-          </div>
-          <p className="mt-4 max-w-sm text-white/70">{company.tagline}</p>
-          <p className="mt-6 text-sm text-white/55">{company.address}</p>
+          <Link className="font-display text-3xl font-bold" href="/">
+            Biswas <span className="text-[color:var(--gold)]">Exports</span>
+          </Link>
+          <p className="mt-4 max-w-sm text-[color:var(--muted)]">
+            {company.tagline}
+          </p>
+          <p className="mt-6 text-sm text-[color:var(--muted)]">
+            {company.address}
+          </p>
         </div>
         {footerLinks.map((group) => (
           <div key={group.title}>
             <h3 className="font-semibold">{group.title}</h3>
             {group.links.map((link) => (
               <Link
-                className="mt-3 block text-sm text-white/65 hover:text-white"
+                className="mt-3 block text-sm text-[color:var(--muted)] transition hover:text-[color:var(--gold-dark)]"
                 href={link.href}
-                key={link.label}
+                key={link.href}
               >
                 {link.label}
               </Link>
@@ -197,7 +220,7 @@ export function Footer() {
           </div>
         ))}
       </div>
-      <div className="border-t border-white/10 px-6 py-6 text-center text-sm text-white/55">
+      <div className="border-t border-[color:var(--line)] px-6 py-6 text-center text-sm text-[color:var(--muted)]">
         © 2026 {company.name}. All rights reserved.
       </div>
     </footer>
@@ -205,31 +228,13 @@ export function Footer() {
 }
 
 export function Chrome() {
-  const [cookie, setCookie] = useState(false);
-
   return (
-    <>
-      <button
-        aria-label="Back to top"
-        className="fixed bottom-6 right-6 z-40 rounded-full bg-[color:var(--gold)] p-3 text-black shadow-xl"
-        onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
-      >
-        <ArrowUp />
-      </button>
-      {!cookie ? (
-        <div className="fixed bottom-6 left-6 z-40 max-w-md rounded-3xl border bg-[color:var(--card)] p-5 shadow-2xl">
-          <p className="text-sm text-[color:var(--muted)]">
-            We use essential cookies and privacy-conscious analytics to improve your
-            experience.
-          </p>
-          <button
-            className="mt-4 rounded-full bg-[color:var(--navy)] px-5 py-2 text-sm font-semibold text-white"
-            onClick={() => setCookie(true)}
-          >
-            Accept
-          </button>
-        </div>
-      ) : null}
-    </>
+    <button
+      aria-label="Back to top"
+      className="fixed bottom-6 right-6 z-40 rounded-full bg-[color:var(--gold)] p-3 text-white shadow-xl transition hover:-translate-y-1 hover:bg-[color:var(--gold-dark)]"
+      onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
+    >
+      <ArrowUp />
+    </button>
   );
 }

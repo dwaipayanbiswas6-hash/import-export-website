@@ -1,121 +1,181 @@
 import {
-  Anchor,
   Boxes,
-  Building2,
+  ClipboardCheck,
   Factory,
+  FileCheck2,
   Globe2,
+  Handshake,
+  Leaf,
   PackageCheck,
-  Plane,
+  Route,
   Search,
   ShieldCheck,
   Ship,
-  Truck,
-  Warehouse,
+  Shirt,
+  Sparkles,
+  Wheat,
 } from 'lucide-react';
 
 export const company = {
-  name: 'AurexTrade Global',
-  shortName: 'AurexTrade',
-  tagline: 'International trade, precisely managed.',
-  email: 'concierge@aurextrade.example',
-  phone: '+1 (212) 555-0148',
-  address: 'One World Trade Center, New York, NY',
+  name: 'Biswas Exports',
+  tagline: 'Indian products. Global possibilities.',
+  email: 'contact@biswasexports.com',
+  address: 'Asansol, West Bengal, India',
 };
 
 export const navItems = [
   { label: 'About', href: '/about' },
+  { label: 'Products', href: '/products' },
   { label: 'Services', href: '/services' },
   { label: 'Industries', href: '/industries' },
-  { label: 'Products', href: '/products' },
   { label: 'Global Presence', href: '/global-presence' },
   { label: 'Contact', href: '/contact' },
 ];
 
-export const services = [
+export const products = [
   {
-    title: 'Import',
-    icon: Ship,
+    title: 'Agricultural Products',
+    icon: Wheat,
     description:
-      'Regulated inbound trade programs with supplier coordination, inspection, insurance, and customs-ready documentation.',
+      'Carefully selected grains, pulses, spices, and agricultural produce prepared for international trade.',
   },
   {
-    title: 'Export',
-    icon: Plane,
+    title: 'Textiles & Apparel',
+    icon: Shirt,
     description:
-      'Market-ready outbound logistics, compliance checks, packaging governance, and buyer documentation for international corridors.',
+      'Quality Indian fabrics, finished textiles, and apparel sourced to match buyer specifications.',
   },
   {
-    title: 'Freight Forwarding',
-    icon: Truck,
+    title: 'Handicrafts & Home Décor',
+    icon: Sparkles,
     description:
-      'Ocean, air, and multimodal freight engineered around cost, urgency, resilience, and real-time exception management.',
+      'Distinctive craft-led collections that celebrate Indian materials, artistry, and contemporary utility.',
   },
   {
-    title: 'Customs',
-    icon: ShieldCheck,
+    title: 'Industrial Goods',
+    icon: Factory,
     description:
-      'Classification, valuation, duty planning, permits, and broker coordination that reduce border risk and costly delays.',
+      'Dependable components, tools, and manufactured goods supported by clear specifications.',
   },
   {
-    title: 'Warehousing',
-    icon: Warehouse,
-    description:
-      'Secure consolidation, bonded storage, inventory visibility, pick-pack, and cross-dock operations near strategic gateways.',
-  },
-  {
-    title: 'Supply Chain',
+    title: 'Consumer Products',
     icon: Boxes,
     description:
-      'End-to-end network design, vendor governance, demand planning, and control tower reporting for executive visibility.',
+      'Thoughtfully sourced everyday products with market-ready packaging and documentation.',
   },
   {
-    title: 'Global Sourcing',
+    title: 'Custom Sourcing',
     icon: Search,
     description:
-      'Qualified supplier discovery, factory audits, sample management, negotiation support, and ethical procurement controls.',
+      'Buyer-led sourcing for suitable Indian products, manufacturers, and commercial requirements.',
+  },
+];
+
+export const services = [
+  {
+    title: 'Product Sourcing',
+    icon: Search,
+    description:
+      'Requirement-led supplier and product discovery across trusted Indian manufacturing ecosystems.',
   },
   {
-    title: 'Door-to-door Delivery',
+    title: 'Quality Coordination',
+    icon: ClipboardCheck,
+    description:
+      'Specification alignment, sample coordination, and practical quality checkpoints before dispatch.',
+  },
+  {
+    title: 'Export Documentation',
+    icon: FileCheck2,
+    description:
+      'Structured commercial and shipping documentation coordinated for each agreed transaction.',
+  },
+  {
+    title: 'Packaging Support',
     icon: PackageCheck,
     description:
-      'Single-accountability delivery from origin collection to destination handover with milestone communication throughout.',
+      'Export-ready packaging guidance shaped around product protection, presentation, and transit needs.',
+  },
+  {
+    title: 'Logistics Coordination',
+    icon: Ship,
+    description:
+      'Clear handoffs with logistics providers for suitable ocean, air, and multimodal movement.',
+  },
+  {
+    title: 'Buyer Communication',
+    icon: Handshake,
+    description:
+      'Responsive, transparent communication from initial enquiry through order coordination.',
   },
 ];
 
 export const industries = [
-  'Manufacturing',
-  'Retail & Consumer Goods',
-  'Automotive',
-  'Food & Agriculture',
-  'Pharmaceuticals',
-  'Energy & Infrastructure',
-  'Technology',
-  'Construction',
+  {
+    title: 'Agriculture & Food',
+    icon: Leaf,
+    description:
+      'Sourcing and export coordination for suitable agricultural and food categories.',
+  },
+  {
+    title: 'Textiles & Lifestyle',
+    icon: Shirt,
+    description:
+      'Flexible product development and sourcing for textile, apparel, and lifestyle buyers.',
+  },
+  {
+    title: 'Manufacturing',
+    icon: Factory,
+    description:
+      'Specification-led coordination for industrial and manufactured product requirements.',
+  },
+  {
+    title: 'Retail & Distribution',
+    icon: Boxes,
+    description:
+      'Curated supply options for importers, distributors, retailers, and private-label programmes.',
+  },
 ];
 
-export const products = [
-  'Industrial Machinery',
-  'Consumer Electronics',
-  'Textiles & Apparel',
-  'Agricultural Commodities',
-  'Automotive Components',
-  'Medical Supplies',
+export const workflow = [
+  {
+    step: '01',
+    title: 'Understand',
+    text: 'We clarify your product, quantity, specification, destination, and timeline.',
+  },
+  {
+    step: '02',
+    title: 'Source',
+    text: 'We identify suitable supply options and coordinate samples or commercial details.',
+  },
+  {
+    step: '03',
+    title: 'Prepare',
+    text: 'We align quality, packaging, and required export documentation.',
+  },
+  {
+    step: '04',
+    title: 'Dispatch',
+    text: 'We coordinate a clear logistics handover and keep communication moving.',
+  },
 ];
 
-export const stats = [
-  { value: '42+', label: 'trade corridors' },
-  { value: '18k+', label: 'annual shipments' },
-  { value: '96%', label: 'on-time clearance' },
-  { value: '24/7', label: 'control tower' },
-];
-
-export const regions = [
-  'North America',
-  'Latin America',
-  'Europe',
-  'Middle East',
-  'Africa',
-  'Asia-Pacific',
+export const values = [
+  {
+    title: 'Clarity at every step',
+    icon: Route,
+    text: 'Straightforward updates, documented requirements, and responsive coordination.',
+  },
+  {
+    title: 'Quality-minded sourcing',
+    icon: ShieldCheck,
+    text: 'Products and supply options considered against the buyer’s stated needs.',
+  },
+  {
+    title: 'Global trade perspective',
+    icon: Globe2,
+    text: 'Export preparation shaped for the practical expectations of international buyers.',
+  },
 ];
 
 export const footerLinks = [
@@ -128,27 +188,18 @@ export const footerLinks = [
     ],
   },
   {
-    title: 'Solutions',
+    title: 'Explore',
     links: [
-      { label: 'Import', href: '/services' },
-      { label: 'Export', href: '/services' },
-      { label: 'Warehousing', href: '/services' },
+      { label: 'Products', href: '/products' },
+      { label: 'Services', href: '/services' },
+      { label: 'Industries', href: '/industries' },
     ],
   },
   {
     title: 'Legal',
     links: [
       { label: 'Privacy Policy', href: '/privacy-policy' },
-      { label: 'Terms', href: '/terms' },
-    ],
-  },
-  {
-    title: 'Support',
-    links: [
-      { label: 'Request Quote', href: '/contact' },
-      { label: 'Services', href: '/services' },
+      { label: 'Terms & Conditions', href: '/terms' },
     ],
   },
 ];
-
-export const megaHighlights = [Anchor, Globe2, Building2, Factory];
