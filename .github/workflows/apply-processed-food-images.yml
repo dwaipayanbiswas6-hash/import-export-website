@@ -1,0 +1,177 @@
+name: Apply Processed Vegetarian Food images
+
+on:
+  push:
+    branches:
+      - fix/processed-vegetarian-food-images
+
+permissions:
+  contents: write
+
+jobs:
+  integrate-images:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/processed-vegetarian-food-images
+          fetch-depth: 0
+
+      - name: Connect images to catalogue
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          products_path = Path('src/lib/products.ts')
+          text = products_path.read_text(encoding='utf-8')
+
+          image_block = """const processedVegetarianFoodImages: Record<
+            string,
+            { image: string; imageAlt: string }
+          > = {
+            pickles: {
+              image: '/images/products/pickles.webp',
+              imageAlt:
+                'Spiced Indian mango pickle in a ceramic jar on a rustic wooden table',
+            },
+            papad: {
+              image: '/images/products/papad.webp',
+              imageAlt: 'Stack of crisp papad on a woven tray over a wooden table',
+            },
+            'instant-vegetarian-mixes': {
+              image: '/images/products/instant-vegetarian-mixes.webp',
+              imageAlt: 'Prepared savoury instant vegetarian mix in a wooden bowl',
+            },
+            'vegetarian-biscuits': {
+              image: '/images/products/vegetarian-biscuits.webp',
+              imageAlt: 'Round golden vegetarian biscuits in a ceramic bowl',
+            },
+            namkeen: {
+              image: '/images/products/namkeen.webp',
+              imageAlt: 'Traditional Indian namkeen mixture in a wooden bowl',
+            },
+            'ready-to-eat-vegan-curries': {
+              image: '/images/products/ready-to-eat-vegan-curries.webp',
+              imageAlt: 'Ready-to-eat chickpea vegan curry in a rustic bowl',
+            },
+            'fruit-juice-concentrates': {
+              image: '/images/products/fruit-juice-concentrates.webp',
+              imageAlt: 'Orange fruit juice concentrate in a bottle and serving bowl',
+            },
+            'coconut-products': {
+              image: '/images/products/coconut-products.webp',
+              imageAlt: 'Fresh coconut with coconut milk and desiccated coconut',
+            },
+            cashews: {
+              image: '/images/products/cashews.webp',
+              imageAlt: 'Whole cashew nuts in a wooden bowl on a rustic table',
+            },
+            raisins: {
+              image: '/images/products/raisins.webp',
+              imageAlt: 'Golden raisins in a wooden bowl on a rustic table',
+            },
+          };
+          """
+
+          marker = '/** Catalogue governance:'
+          if 'const processedVegetarianFoodImages' not in text:
+              if marker not in text:
+                  raise SystemExit('Catalogue insertion marker was not found.')
+              text = text.replace(marker, image_block + '\n' + marker, 1)
+
+          old_lookup = '  const productImage = foodAndAgricultureImages[seed.slug];'
+          new_lookup = """  const productImage =
+            foodAndAgricultureImages[seed.slug] ??
+            processedVegetarianFoodImages[seed.slug];"""
+          if old_lookup in text:
+              text = text.replace(old_lookup, new_lookup, 1)
+          elif new_lookup not in text:
+              raise SystemExit('Product image lookup could not be updated safely.')
+
+          products_path.write_text(text, encoding='utf-8')
+
+          Path('IMAGE_SOURCES.md').write_text(
+              """# Product image sources and licensing
+
+          The 18 Food & Agriculture and 10 Processed Vegetarian Food WebP
+          visuals under `public/images/products/` were AI-generated with OpenAI
+          specifically for the Biswas Exports catalogue.
+
+          These 28 images are illustrative catalogue visuals. They must not be
+          described as photographs of actual Biswas Exports inventory, suppliers,
+          farms, factories, packaging or shipments.
+
+          The remaining 59 catalogue products continue to use original neutral SVG
+          illustrations generated specifically for the Biswas Exports project.
+
+          No third-party marketplace photographs, supplier logos, watermarks or
+          external copyrighted images are used.
+
+          Preserve the existing 4:3 image aspect ratio when replacing catalogue
+          visuals.
+          """,
+              encoding='utf-8',
+          )
+          PY
+
+          rm -f \
+            public/images/products/pickles.svg \
+            public/images/products/papad.svg \
+            public/images/products/instant-vegetarian-mixes.svg \
+            public/images/products/vegetarian-biscuits.svg \
+            public/images/products/namkeen.svg \
+            public/images/products/ready-to-eat-vegan-curries.svg \
+            public/images/products/fruit-juice-concentrates.svg \
+            public/images/products/coconut-products.svg \
+            public/images/products/cashews.svg \
+            public/images/products/raisins.svg
+
+      - name: Verify uploaded images
+        shell: bash
+        run: |
+          for image in \
+            pickles papad instant-vegetarian-mixes vegetarian-biscuits namkeen \
+            ready-to-eat-vegan-curries fruit-juice-concentrates coconut-products \
+            cashews raisins
+          do
+            test -f "public/images/products/${image}.webp"
+          done
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      - name: Format changed text files
+        run: npx prettier --write src/lib/products.ts IMAGE_SOURCES.md
+
+      - name: Validate catalogue
+        run: npm run catalogue:validate
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit integrated catalogue changes
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/products.ts IMAGE_SOURCES.md public/images/products
+          if git diff --cached --quiet; then
+            echo "No catalogue changes to commit."
+          else
+            git commit -m "Use Processed Vegetarian Food catalogue images"
+            git push origin HEAD:fix/processed-vegetarian-food-images
+          fi
