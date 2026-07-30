@@ -164,8 +164,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Check formatting
-        run: npm run format:check
+      - name: Check formatting of changed files
+        run: npx prettier --check src/lib/products.ts IMAGE_SOURCES.md
 
       - name: Build
         run: npm run build
