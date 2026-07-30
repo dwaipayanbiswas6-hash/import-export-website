@@ -1,6 +1,13 @@
 'use client';
 
-import { Clock3, Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
+import {
+  BriefcaseBusiness,
+  Clock3,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -13,25 +20,35 @@ import {
 } from '@/lib/contact';
 
 type SubmissionState = 'idle' | 'submitting' | 'success' | 'error';
-
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const ACCEPTED_FILE_TYPES = [
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'image/png',
+  'image/jpeg',
+];
 const inputClass =
-  'rounded-xl border border-[color:var(--line)] bg-white p-4 font-normal outline-none transition focus:border-[color:var(--gold)] focus:ring-2 focus:ring-[color:var(--gold-soft)]';
+  'w-full rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3.5 font-normal shadow-sm outline-none transition duration-200 hover:border-[color:var(--gold-soft)] focus:border-[color:var(--gold)] focus:ring-2 focus:ring-[color:var(--gold-soft)]';
+const labelClass = 'grid gap-2 text-sm font-semibold';
 
-function contactValue(value: string | undefined) {
+function configured(value: string | undefined) {
   return value?.trim() || null;
 }
 
 export default function Contact() {
   const [submissionState, setSubmissionState] =
     useState<SubmissionState>('idle');
+  const [rfqFile, setRfqFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState('');
   const statusRef = useRef<HTMLDivElement>(null);
-  const contactEmail = contactValue(process.env.NEXT_PUBLIC_CONTACT_EMAIL);
-  const contactPhone = contactValue(process.env.NEXT_PUBLIC_CONTACT_PHONE);
-  const whatsapp = contactValue(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const contactEmail = configured(process.env.NEXT_PUBLIC_CONTACT_EMAIL);
+  const contactPhone = configured(process.env.NEXT_PUBLIC_CONTACT_PHONE);
+  const whatsapp = configured(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER);
   const whatsappHref = whatsapp
     ? `https://wa.me/${whatsapp.replace(/\D/g, '')}`
     : null;
-
   const {
     register,
     handleSubmit,
@@ -41,32 +58,56 @@ export default function Contact() {
   } = useForm<ContactFormData>({
     defaultValues: {
       website: '',
-      incoterm: 'Not decided',
+      incoterm: 'Not Decided',
       privacyConsent: false,
     },
   });
 
   useEffect(() => {
-    if (submissionState === 'success' || submissionState === 'error') {
+    if (submissionState === 'success' || submissionState === 'error')
       statusRef.current?.focus();
-    }
   }, [submissionState]);
+
+  function selectFile(file: File | null) {
+    setFileError('');
+    if (!file) {
+      setRfqFile(null);
+      return;
+    }
+    if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+      setRfqFile(null);
+      setFileError('Upload a PDF, DOCX, XLSX, PNG, or JPG file.');
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setRfqFile(null);
+      setFileError('The file must be no larger than 10 MB.');
+      return;
+    }
+    setRfqFile(file);
+  }
 
   async function onSubmit(data: ContactFormData) {
     const validation = contactSchema.safeParse(data);
     if (!validation.success) {
-      validation.error.issues.forEach((issue) => {
-        const field = issue.path[0] as keyof ContactFormData;
-        setError(field, { message: issue.message });
-      });
+      validation.error.issues.forEach((issue) =>
+        setError(issue.path[0] as keyof ContactFormData, {
+          message: issue.message,
+        }),
+      );
       return;
     }
+    if (fileError) return;
     setSubmissionState('submitting');
+    const payload = new FormData();
+    Object.entries(validation.data).forEach(([key, value]) =>
+      payload.append(key, String(value ?? '')),
+    );
+    if (rfqFile) payload.append('rfqFile', rfqFile);
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(validation.data),
+        body: payload,
       });
       if (!response.ok) throw new Error('Submission failed');
       setSubmissionState('success');
@@ -77,109 +118,83 @@ export default function Contact() {
 
   function submitAnother() {
     reset();
+    setRfqFile(null);
+    setFileError('');
+    if (fileRef.current) fileRef.current.value = '';
     setSubmissionState('idle');
   }
 
   const errorFor = (name: keyof ContactFormData) => errors[name]?.message;
+  const fieldError = (name: keyof ContactFormData) =>
+    errorFor(name) ? (
+      <span id={`${name}-error`} className="text-sm text-red-700">
+        {errorFor(name)}
+      </span>
+    ) : null;
+  const ariaError = (name: keyof ContactFormData) => ({
+    'aria-invalid': !!errors[name],
+    'aria-describedby': errors[name] ? `${name}-error` : undefined,
+  });
 
   return (
     <>
       <PageHero
-        eyebrow="Contact"
+        eyebrow="CONTACT"
         title="Tell us what you need to source from India."
-        intro="Share the product, specifications, quantity, and destination. Biswas Exports will review your requirement and respond with the next steps."
+        intro="Share your sourcing requirement, product specifications, quantity, destination and timeline. Biswas Exports will review your enquiry and respond with the next steps."
       />
-      <section className="mx-auto grid max-w-7xl gap-12 px-6 py-20 lg:grid-cols-[.7fr_1.3fr] lg:px-8">
-        <aside>
-          <h2 className="text-3xl font-semibold">Connect with us</h2>
+      <section className="mx-auto grid max-w-7xl gap-12 px-6 py-20 lg:grid-cols-[.7fr_1.3fr] lg:px-8 lg:py-24">
+        <aside className="self-start lg:sticky lg:top-28">
+          <p className="eyebrow">Business enquiries</p>
+          <h2 className="text-3xl font-semibold">
+            Connect with Biswas Exports
+          </h2>
           <p className="mt-5 leading-7 text-[color:var(--muted)]">
-            Send a detailed requirement or use one of the direct contact options
-            below.
+            Professional sourcing assistance from India for serious
+            international buying requirements.
           </p>
-          <div className="mt-8 grid gap-4">
-            <div className="flex gap-3">
-              <MapPin className="shrink-0 text-[color:var(--gold)]" />
-              <div>
-                <b>Location</b>
-                <p className="text-[color:var(--muted)]">
-                  Asansol, West Bengal, India
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <Mail className="shrink-0 text-[color:var(--gold)]" />
-              <div>
-                <b>Email</b>
-                <p>
-                  {contactEmail ? (
-                    <a
-                      className="text-[color:var(--gold-dark)] underline-offset-4 hover:underline"
-                      href={`mailto:${contactEmail}`}
-                    >
-                      {contactEmail}
-                    </a>
-                  ) : (
-                    <span className="text-[color:var(--muted)]">
-                      Contact details coming soon
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <Phone className="shrink-0 text-[color:var(--gold)]" />
-              <div>
-                <b>Phone</b>
-                <p>
-                  {contactPhone ? (
-                    <a
-                      className="text-[color:var(--gold-dark)] underline-offset-4 hover:underline"
-                      href={`tel:${contactPhone}`}
-                    >
-                      {contactPhone}
-                    </a>
-                  ) : (
-                    <span className="text-[color:var(--muted)]">
-                      Contact details coming soon
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <MessageCircle className="shrink-0 text-[color:var(--gold)]" />
-              <div>
-                <b>WhatsApp</b>
-                <p>
-                  {whatsappHref ? (
-                    <a
-                      className="text-[color:var(--gold-dark)] underline-offset-4 hover:underline"
-                      href={whatsappHref}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      Message on WhatsApp
-                    </a>
-                  ) : (
-                    <span className="text-[color:var(--muted)]">
-                      Contact details coming soon
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <Clock3 className="shrink-0 text-[color:var(--gold)]" />
-              <div>
-                <b>Working hours</b>
-                <p className="text-[color:var(--muted)]">
-                  Monday to Saturday, 10:00 AM to 7:00 PM IST
-                </p>
-                <p className="mt-1 text-sm text-[color:var(--muted)]">
-                  Typical response within one business day
-                </p>
-              </div>
-            </div>
+          <div className="mt-9 grid gap-5 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--cream)] p-6 shadow-sm">
+            <ContactItem icon={MapPin} title="Location">
+              <span>Asansol, West Bengal, India</span>
+            </ContactItem>
+            <ContactItem icon={Mail} title="Email">
+              {contactEmail ? (
+                <a className="contact-link" href={`mailto:${contactEmail}`}>
+                  {contactEmail}
+                </a>
+              ) : (
+                <span>Contact details coming soon</span>
+              )}
+            </ContactItem>
+            <ContactItem icon={Phone} title="Phone">
+              {contactPhone ? (
+                <a className="contact-link" href={`tel:${contactPhone}`}>
+                  {contactPhone}
+                </a>
+              ) : (
+                <span>Contact details coming soon</span>
+              )}
+            </ContactItem>
+            <ContactItem icon={MessageCircle} title="WhatsApp">
+              {whatsappHref ? (
+                <a
+                  className="contact-link"
+                  href={whatsappHref}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Message on WhatsApp
+                </a>
+              ) : (
+                <span>Contact details coming soon</span>
+              )}
+            </ContactItem>
+            <ContactItem icon={Clock3} title="Typical response">
+              <span>Within one business day.</span>
+            </ContactItem>
+            <ContactItem icon={BriefcaseBusiness} title="Enquiry policy">
+              <span>Business enquiries only.</span>
+            </ContactItem>
           </div>
         </aside>
 
@@ -190,16 +205,20 @@ export default function Contact() {
             className="premium-card self-start outline-none"
             tabIndex={-1}
           >
-            <p className="eyebrow">Enquiry received</p>
+            <p className="eyebrow">Enquiry Submitted Successfully</p>
             <h2 className="text-3xl font-semibold">
               Thank you for contacting Biswas Exports.
             </h2>
-            <p className="mt-4 leading-7 text-[color:var(--muted)]">
-              Your requirement has been submitted successfully. We will review
-              the details and respond with the next steps.
+            <p className="mt-5 leading-7 text-[color:var(--muted)]">
+              Our export team will review your enquiry and respond after
+              verifying the business details provided.
             </p>
+            <div className="mt-7 border-l-2 border-[color:var(--gold)] pl-4">
+              <b>Typical response time:</b>
+              <p className="text-[color:var(--muted)]">One business day.</p>
+            </div>
             <button
-              className="button-primary mt-7"
+              className="button-primary mt-8"
               type="button"
               onClick={submitAnother}
             >
@@ -210,7 +229,7 @@ export default function Contact() {
           <form
             noValidate
             onSubmit={handleSubmit(onSubmit)}
-            className="grid gap-5 rounded-[2rem] border border-[color:var(--line)] bg-white p-7 shadow-xl md:grid-cols-2 md:p-10"
+            className="grid gap-8 rounded-[2rem] border border-[color:var(--line)] bg-white p-7 shadow-xl md:p-10"
           >
             <div className="absolute -left-[10000px]" aria-hidden="true">
               <label htmlFor="website">Website</label>
@@ -221,252 +240,253 @@ export default function Contact() {
                 {...register('website')}
               />
             </div>
-            <label className="grid gap-2 font-semibold" htmlFor="fullName">
-              Full name
-              <input
-                id="fullName"
-                autoComplete="name"
-                className={inputClass}
-                aria-invalid={!!errors.fullName}
-                aria-describedby={
-                  errors.fullName ? 'fullName-error' : undefined
-                }
-                {...register('fullName')}
-              />
-              {errorFor('fullName') && (
-                <span id="fullName-error" className="text-sm text-red-700">
-                  {errorFor('fullName')}
-                </span>
-              )}
-            </label>
-            <label className="grid gap-2 font-semibold" htmlFor="businessEmail">
-              Business email
-              <input
-                id="businessEmail"
-                type="email"
-                autoComplete="email"
-                className={inputClass}
-                aria-invalid={!!errors.businessEmail}
-                aria-describedby={
-                  errors.businessEmail ? 'businessEmail-error' : undefined
-                }
-                {...register('businessEmail')}
-              />
-              {errorFor('businessEmail') && (
-                <span id="businessEmail-error" className="text-sm text-red-700">
-                  {errorFor('businessEmail')}
-                </span>
-              )}
-            </label>
-            <label className="grid gap-2 font-semibold" htmlFor="country">
-              Country
-              <input
-                id="country"
-                autoComplete="country-name"
-                className={inputClass}
-                aria-invalid={!!errors.country}
-                aria-describedby={errors.country ? 'country-error' : undefined}
-                {...register('country')}
-              />
-              {errorFor('country') && (
-                <span id="country-error" className="text-sm text-red-700">
-                  {errorFor('country')}
-                </span>
-              )}
-            </label>
-            <label className="grid gap-2 font-semibold" htmlFor="phone">
-              Phone or WhatsApp number
-              <input
-                id="phone"
-                type="tel"
-                autoComplete="tel"
-                className={inputClass}
-                aria-invalid={!!errors.phone}
-                aria-describedby={errors.phone ? 'phone-error' : undefined}
-                {...register('phone')}
-              />
-              {errorFor('phone') && (
-                <span id="phone-error" className="text-sm text-red-700">
-                  {errorFor('phone')}
-                </span>
-              )}
-            </label>
-            <label className="grid gap-2 font-semibold" htmlFor="companyName">
-              Company name{' '}
-              <span className="text-sm font-normal text-[color:var(--muted)]">
-                (optional)
-              </span>
-              <input
-                id="companyName"
-                autoComplete="organization"
-                className={inputClass}
-                {...register('companyName')}
-              />
-            </label>
-            <label
-              className="grid gap-2 font-semibold"
-              htmlFor="productCategory"
+
+            <FormSection
+              number="01"
+              title="Company information"
+              intro="Tell us who we will be working with."
             >
-              Product category
-              <select
-                id="productCategory"
-                defaultValue=""
-                className={inputClass}
-                aria-invalid={!!errors.productCategory}
-                aria-describedby={
-                  errors.productCategory ? 'productCategory-error' : undefined
-                }
-                {...register('productCategory')}
-              >
-                <option value="" disabled>
-                  Select a category
-                </option>
-                {productCategories.map((category) => (
-                  <option key={category}>{category}</option>
-                ))}
-              </select>
-              {errorFor('productCategory') && (
-                <span
-                  id="productCategory-error"
-                  className="text-sm text-red-700"
-                >
-                  {errorFor('productCategory')}
-                </span>
-              )}
-            </label>
-            <label
-              className="grid gap-2 font-semibold md:col-span-2"
-              htmlFor="productRequirement"
-            >
-              Product requirement
-              <textarea
-                id="productRequirement"
-                className={`${inputClass} min-h-32`}
-                aria-invalid={!!errors.productRequirement}
-                aria-describedby={
-                  errors.productRequirement
-                    ? 'productRequirement-error'
-                    : undefined
-                }
-                {...register('productRequirement')}
-              />
-              {errorFor('productRequirement') && (
-                <span
-                  id="productRequirement-error"
-                  className="text-sm text-red-700"
-                >
-                  {errorFor('productRequirement')}
-                </span>
-              )}
-            </label>
-            <label
-              className="grid gap-2 font-semibold md:col-span-2"
-              htmlFor="productSpecifications"
-            >
-              Product specifications{' '}
-              <span className="text-sm font-normal text-[color:var(--muted)]">
-                (optional)
-              </span>
-              <textarea
-                id="productSpecifications"
-                className={`${inputClass} min-h-28`}
-                {...register('productSpecifications')}
-              />
-            </label>
-            <label className="grid gap-2 font-semibold" htmlFor="quantity">
-              Required quantity
-              <input
-                id="quantity"
-                className={inputClass}
-                aria-invalid={!!errors.quantity}
-                aria-describedby={
-                  errors.quantity ? 'quantity-error' : undefined
-                }
-                {...register('quantity')}
-              />
-              {errorFor('quantity') && (
-                <span id="quantity-error" className="text-sm text-red-700">
-                  {errorFor('quantity')}
-                </span>
-              )}
-            </label>
-            <label className="grid gap-2 font-semibold" htmlFor="destination">
-              Destination country or port
-              <input
-                id="destination"
-                className={inputClass}
-                aria-invalid={!!errors.destination}
-                aria-describedby={
-                  errors.destination ? 'destination-error' : undefined
-                }
-                {...register('destination')}
-              />
-              {errorFor('destination') && (
-                <span id="destination-error" className="text-sm text-red-700">
-                  {errorFor('destination')}
-                </span>
-              )}
-            </label>
-            <label className="grid gap-2 font-semibold" htmlFor="timeline">
-              Target timeline
-              <input
-                id="timeline"
-                className={inputClass}
-                placeholder="For example, within 3 months"
-                aria-invalid={!!errors.timeline}
-                aria-describedby={
-                  errors.timeline ? 'timeline-error' : undefined
-                }
-                {...register('timeline')}
-              />
-              {errorFor('timeline') && (
-                <span id="timeline-error" className="text-sm text-red-700">
-                  {errorFor('timeline')}
-                </span>
-              )}
-            </label>
-            <label className="grid gap-2 font-semibold" htmlFor="incoterm">
-              Preferred Incoterm{' '}
-              <span className="text-sm font-normal text-[color:var(--muted)]">
-                (optional)
-              </span>
-              <select
-                id="incoterm"
-                className={inputClass}
-                {...register('incoterm')}
-              >
-                {incoterms.map((term) => (
-                  <option key={term}>{term}</option>
-                ))}
-              </select>
-            </label>
-            <label
-              className="grid gap-2 font-semibold md:col-span-2"
-              htmlFor="additionalNotes"
-            >
-              Additional notes{' '}
-              <span className="text-sm font-normal text-[color:var(--muted)]">
-                (optional)
-              </span>
-              <textarea
-                id="additionalNotes"
-                className={`${inputClass} min-h-28`}
-                {...register('additionalNotes')}
-              />
-            </label>
-            <div className="md:col-span-2">
               <label
-                className="flex items-start gap-3 font-normal"
+                className={`${labelClass} md:col-span-2`}
+                htmlFor="companyName"
+              >
+                Company / Business Name *
+                <input
+                  id="companyName"
+                  autoComplete="organization"
+                  className={inputClass}
+                  {...ariaError('companyName')}
+                  {...register('companyName')}
+                />
+                {fieldError('companyName')}
+              </label>
+              <label className={labelClass} htmlFor="contactPerson">
+                Contact Person *
+                <input
+                  id="contactPerson"
+                  autoComplete="name"
+                  className={inputClass}
+                  {...ariaError('contactPerson')}
+                  {...register('contactPerson')}
+                />
+                {fieldError('contactPerson')}
+              </label>
+              <label className={labelClass} htmlFor="jobTitle">
+                Job Title *
+                <input
+                  id="jobTitle"
+                  autoComplete="organization-title"
+                  className={inputClass}
+                  {...ariaError('jobTitle')}
+                  {...register('jobTitle')}
+                />
+                {fieldError('jobTitle')}
+              </label>
+              <label className={labelClass} htmlFor="companyWebsite">
+                Company Website{' '}
+                <span className="font-normal text-[color:var(--muted)]">
+                  (optional)
+                </span>
+                <input
+                  id="companyWebsite"
+                  type="url"
+                  placeholder="https://example.com"
+                  autoComplete="url"
+                  className={inputClass}
+                  {...ariaError('companyWebsite')}
+                  {...register('companyWebsite')}
+                />
+                {fieldError('companyWebsite')}
+              </label>
+              <label className={labelClass} htmlFor="businessEmail">
+                Business Email *
+                <input
+                  id="businessEmail"
+                  type="email"
+                  autoComplete="email"
+                  className={inputClass}
+                  {...ariaError('businessEmail')}
+                  {...register('businessEmail')}
+                />
+                {fieldError('businessEmail')}
+              </label>
+              <label className={labelClass} htmlFor="country">
+                Country *
+                <input
+                  id="country"
+                  autoComplete="country-name"
+                  className={inputClass}
+                  {...ariaError('country')}
+                  {...register('country')}
+                />
+                {fieldError('country')}
+              </label>
+              <label className={labelClass} htmlFor="phone">
+                Phone or WhatsApp Number *
+                <input
+                  id="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  className={inputClass}
+                  {...ariaError('phone')}
+                  {...register('phone')}
+                />
+                {fieldError('phone')}
+              </label>
+            </FormSection>
+
+            <FormSection
+              number="02"
+              title="Enquiry details"
+              intro="Provide enough detail for a focused initial review."
+            >
+              <label className={labelClass} htmlFor="productCategory">
+                Product Category *
+                <select
+                  id="productCategory"
+                  defaultValue=""
+                  className={inputClass}
+                  {...ariaError('productCategory')}
+                  {...register('productCategory')}
+                >
+                  <option value="" disabled>
+                    Select a category
+                  </option>
+                  {productCategories.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+                {fieldError('productCategory')}
+              </label>
+              <label className={labelClass} htmlFor="quantity">
+                Required Quantity *
+                <input
+                  id="quantity"
+                  className={inputClass}
+                  {...ariaError('quantity')}
+                  {...register('quantity')}
+                />
+                {fieldError('quantity')}
+              </label>
+              <label
+                className={`${labelClass} md:col-span-2`}
+                htmlFor="productRequirement"
+              >
+                Product Requirement *
+                <textarea
+                  id="productRequirement"
+                  className={`${inputClass} min-h-32 resize-y`}
+                  {...ariaError('productRequirement')}
+                  {...register('productRequirement')}
+                />
+                {fieldError('productRequirement')}
+              </label>
+              <label
+                className={`${labelClass} md:col-span-2`}
+                htmlFor="productSpecifications"
+              >
+                Product Specifications{' '}
+                <span className="font-normal text-[color:var(--muted)]">
+                  (optional)
+                </span>
+                <textarea
+                  id="productSpecifications"
+                  className={`${inputClass} min-h-28 resize-y`}
+                  {...register('productSpecifications')}
+                />
+              </label>
+              <label className={labelClass} htmlFor="destination">
+                Destination Country / Port *
+                <input
+                  id="destination"
+                  className={inputClass}
+                  {...ariaError('destination')}
+                  {...register('destination')}
+                />
+                {fieldError('destination')}
+              </label>
+              <label className={labelClass} htmlFor="timeline">
+                Target Timeline *
+                <input
+                  id="timeline"
+                  placeholder="For example, within 3 months"
+                  className={inputClass}
+                  {...ariaError('timeline')}
+                  {...register('timeline')}
+                />
+                {fieldError('timeline')}
+              </label>
+              <label className={labelClass} htmlFor="incoterm">
+                Preferred Incoterm{' '}
+                <span className="font-normal text-[color:var(--muted)]">
+                  (optional)
+                </span>
+                <select
+                  id="incoterm"
+                  className={inputClass}
+                  {...register('incoterm')}
+                >
+                  {incoterms.map((item) => (
+                    <option key={item}>{item}</option>
+                  ))}
+                </select>
+              </label>
+              <label className={labelClass} htmlFor="rfqFile">
+                Upload RFQ / Specification{' '}
+                <span className="font-normal text-[color:var(--muted)]">
+                  (optional)
+                </span>
+                <span className="rounded-2xl border border-dashed border-[color:var(--gold-soft)] bg-[color:var(--cream)] p-4 transition hover:border-[color:var(--gold)]">
+                  <input
+                    ref={fileRef}
+                    id="rfqFile"
+                    type="file"
+                    accept=".pdf,.docx,.xlsx,.png,.jpg,.jpeg"
+                    className="block w-full cursor-pointer text-sm file:mr-4 file:rounded-full file:border-0 file:bg-[color:var(--gold)] file:px-4 file:py-2 file:font-semibold file:text-white"
+                    aria-describedby="rfqFile-help rfqFile-error"
+                    onChange={(event) =>
+                      selectFile(event.target.files?.[0] ?? null)
+                    }
+                  />
+                  <span
+                    id="rfqFile-help"
+                    className="mt-2 block text-xs font-normal text-[color:var(--muted)]"
+                  >
+                    PDF, DOCX, XLSX, PNG or JPG · Maximum 10 MB
+                  </span>
+                </span>
+                {fileError && (
+                  <span id="rfqFile-error" className="text-sm text-red-700">
+                    {fileError}
+                  </span>
+                )}
+              </label>
+              <label
+                className={`${labelClass} md:col-span-2`}
+                htmlFor="additionalNotes"
+              >
+                Additional Notes{' '}
+                <span className="font-normal text-[color:var(--muted)]">
+                  (optional)
+                </span>
+                <textarea
+                  id="additionalNotes"
+                  className={`${inputClass} min-h-28 resize-y`}
+                  {...register('additionalNotes')}
+                />
+              </label>
+            </FormSection>
+
+            <div>
+              <label
+                className="flex items-start gap-3 text-sm"
                 htmlFor="privacyConsent"
               >
                 <input
                   id="privacyConsent"
                   type="checkbox"
-                  className="mt-1 h-5 w-5 accent-[color:var(--gold)]"
-                  aria-invalid={!!errors.privacyConsent}
-                  aria-describedby={
-                    errors.privacyConsent ? 'privacyConsent-error' : undefined
-                  }
+                  className="mt-0.5 h-5 w-5 shrink-0 accent-[color:var(--gold)]"
+                  {...ariaError('privacyConsent')}
                   {...register('privacyConsent')}
                 />
                 <span>
@@ -480,14 +500,7 @@ export default function Contact() {
                   </Link>
                 </span>
               </label>
-              {errorFor('privacyConsent') && (
-                <span
-                  id="privacyConsent-error"
-                  className="mt-2 block text-sm text-red-700"
-                >
-                  {errorFor('privacyConsent')}
-                </span>
-              )}
+              {fieldError('privacyConsent')}
             </div>
             {submissionState === 'error' && (
               <div
@@ -495,7 +508,7 @@ export default function Contact() {
                 role="alert"
                 aria-live="assertive"
                 tabIndex={-1}
-                className="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800 outline-none md:col-span-2"
+                className="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800 outline-none"
               >
                 We could not send your enquiry right now. Please try again or
                 contact us directly by email or WhatsApp.
@@ -503,16 +516,67 @@ export default function Contact() {
             )}
             <button
               disabled={submissionState === 'submitting'}
-              className="button-primary justify-self-start disabled:cursor-not-allowed disabled:opacity-60 md:col-span-2"
+              className="button-primary justify-self-start px-8 transition duration-300 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-60"
               type="submit"
             >
               {submissionState === 'submitting'
                 ? 'Sending enquiry...'
-                : 'Send enquiry'}
+                : 'Submit business enquiry'}
             </button>
           </form>
         )}
       </section>
     </>
+  );
+}
+
+function ContactItem({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: typeof MapPin;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex gap-3">
+      <Icon
+        className="mt-0.5 shrink-0 text-[color:var(--gold)]"
+        size={20}
+        aria-hidden="true"
+      />
+      <div>
+        <b className="text-sm">{title}</b>
+        <p className="mt-0.5 text-sm text-[color:var(--muted)]">{children}</p>
+      </div>
+    </div>
+  );
+}
+
+function FormSection({
+  number,
+  title,
+  intro,
+  children,
+}: {
+  number: string;
+  title: string;
+  intro: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <fieldset className="grid gap-5 border-0 p-0 md:grid-cols-2">
+      <legend className="mb-1 w-full border-b border-[color:var(--line)] pb-5">
+        <span className="mr-3 font-display text-2xl text-[color:var(--gold)]">
+          {number}
+        </span>
+        <span className="font-display text-2xl font-semibold">{title}</span>
+        <span className="mt-2 block text-sm font-normal text-[color:var(--muted)]">
+          {intro}
+        </span>
+      </legend>
+      {children}
+    </fieldset>
   );
 }

@@ -11,17 +11,32 @@ export const productCategories = [
 ] as const;
 
 export const incoterms = [
-  'Not decided',
+  'Not Decided',
   'EXW',
   'FOB',
+  'FCA',
   'CFR',
   'CIF',
+  'DAP',
   'DDP',
   'Other',
 ] as const;
 
 export const contactSchema = z.object({
-  fullName: z.string().trim().min(2, 'Please enter your full name.'),
+  companyName: z
+    .string()
+    .trim()
+    .min(2, 'Please enter your company or business name.'),
+  contactPerson: z.string().trim().min(2, 'Please enter the contact person.'),
+  jobTitle: z.string().trim().min(1, 'Please enter the job title.'),
+  companyWebsite: z
+    .string()
+    .trim()
+    .refine(
+      (value) => !value || z.url().safeParse(value).success,
+      'Please enter a valid website URL, including https://.',
+    )
+    .optional(),
   businessEmail: z
     .string()
     .trim()
@@ -31,7 +46,6 @@ export const contactSchema = z.object({
     .string()
     .trim()
     .min(7, 'Please enter a valid phone or WhatsApp number.'),
-  companyName: z.string().trim().optional(),
   productCategory: z.enum(productCategories, {
     error: 'Please select a product category.',
   }),
@@ -43,7 +57,10 @@ export const contactSchema = z.object({
   quantity: z.string().trim().min(1, 'Please enter the required quantity.'),
   destination: z.string().trim().min(1, 'Please enter a destination.'),
   timeline: z.string().trim().min(1, 'Please enter your target timeline.'),
-  incoterm: z.enum(incoterms).optional(),
+  incoterm: z.preprocess(
+    (value) => (value === '' ? undefined : value),
+    z.enum(incoterms).optional(),
+  ),
   additionalNotes: z.string().trim().optional(),
   privacyConsent: z
     .boolean()

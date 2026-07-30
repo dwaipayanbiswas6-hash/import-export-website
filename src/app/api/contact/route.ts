@@ -4,6 +4,14 @@ import { contactSchema, type ContactFormData } from '@/lib/contact';
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT = 5;
 const requests = new Map<string, number[]>();
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const ALLOWED_FILE_TYPES = new Set([
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'image/png',
+  'image/jpeg',
+]);
 
 function escapeHtml(value: string) {
   return value
@@ -39,16 +47,18 @@ function row(label: string, value?: string) {
 }
 
 function enquiryHtml(data: ContactFormData) {
-  return `<h1>New export enquiry</h1><table>${row('Full name', data.fullName)}${row('Business email', data.businessEmail)}${row('Country', data.country)}${row('Phone / WhatsApp', data.phone)}${row('Company', data.companyName)}${row('Product category', data.productCategory)}${row('Product requirement', data.productRequirement)}${row('Product specifications', data.productSpecifications)}${row('Required quantity', data.quantity)}${row('Destination', data.destination)}${row('Target timeline', data.timeline)}${row('Preferred Incoterm', data.incoterm)}${row('Additional notes', data.additionalNotes)}${row('Privacy consent', data.privacyConsent ? 'Agreed' : 'Not agreed')}</table>`;
+  return `<h1>New export enquiry</h1><table>${row('Company / Business Name', data.companyName)}${row('Contact Person', data.contactPerson)}${row('Job Title', data.jobTitle)}${row('Company Website', data.companyWebsite)}${row('Business email', data.businessEmail)}${row('Country', data.country)}${row('Phone / WhatsApp', data.phone)}${row('Product category', data.productCategory)}${row('Product requirement', data.productRequirement)}${row('Product specifications', data.productSpecifications)}${row('Required quantity', data.quantity)}${row('Destination', data.destination)}${row('Target timeline', data.timeline)}${row('Preferred Incoterm', data.incoterm)}${row('Additional notes', data.additionalNotes)}${row('Privacy consent', data.privacyConsent ? 'Agreed' : 'Not agreed')}</table>`;
 }
 
 function enquiryText(data: ContactFormData) {
   return [
-    ['Full name', data.fullName],
+    ['Company / Business Name', data.companyName],
+    ['Contact Person', data.contactPerson],
+    ['Job Title', data.jobTitle],
+    ['Company Website', data.companyWebsite],
     ['Business email', data.businessEmail],
     ['Country', data.country],
     ['Phone / WhatsApp', data.phone],
-    ['Company', data.companyName],
     ['Product category', data.productCategory],
     ['Product requirement', data.productRequirement],
     ['Product specifications', data.productSpecifications],
@@ -71,9 +81,9 @@ export async function POST(request: Request) {
     );
   }
 
-  let body: unknown;
+  let body: FormData;
   try {
-    body = await request.json();
+    body = await request.formData();
   } catch {
     return NextResponse.json(
       { error: 'Invalid request body.' },
@@ -81,12 +91,47 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = contactSchema.safeParse(body);
+  const value = (name: string) => String(body.get(name) ?? '');
+  const result = contactSchema.safeParse({
+    companyName: value('companyName'),
+    contactPerson: value('contactPerson'),
+    jobTitle: value('jobTitle'),
+    companyWebsite: value('companyWebsite'),
+    businessEmail: value('businessEmail'),
+    country: value('country'),
+    phone: value('phone'),
+    productCategory: value('productCategory'),
+    productRequirement: value('productRequirement'),
+    productSpecifications: value('productSpecifications'),
+    quantity: value('quantity'),
+    destination: value('destination'),
+    timeline: value('timeline'),
+    incoterm: value('incoterm'),
+    additionalNotes: value('additionalNotes'),
+    privacyConsent: value('privacyConsent') === 'true',
+    website: value('website'),
+  });
   if (!result.success) {
     return NextResponse.json(
       {
         error: 'Please check the submitted fields.',
         issues: result.error.flatten().fieldErrors,
+      },
+      { status: 400 },
+    );
+  }
+
+  const uploaded = body.get('rfqFile');
+  const rfqFile =
+    uploaded instanceof File && uploaded.size > 0 ? uploaded : null;
+  if (
+    rfqFile &&
+    (rfqFile.size > MAX_FILE_SIZE || !ALLOWED_FILE_TYPES.has(rfqFile.type))
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          'The RFQ file must be PDF, DOCX, XLSX, PNG, or JPG and no larger than 10 MB.',
       },
       { status: 400 },
     );
@@ -118,9 +163,19 @@ export async function POST(request: Request) {
           from,
           to: [to],
           reply_to: result.data.businessEmail,
-          subject: `Export enquiry: ${result.data.productCategory} — ${result.data.fullName}`,
+          subject: `Export enquiry: ${result.data.productCategory} — ${result.data.companyName}`,
           html: enquiryHtml(result.data),
           text: enquiryText(result.data),
+          attachments: rfqFile
+            ? [
+                {
+                  filename: rfqFile.name,
+                  content: Buffer.from(await rfqFile.arrayBuffer()).toString(
+                    'base64',
+                  ),
+                },
+              ]
+            : undefined,
         },
         {
           from,
