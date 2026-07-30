@@ -724,15 +724,96 @@ const categoryNarrative: Record<ProductCategory, string> = {
   'Home & Lifestyle':
     'Material, dimensions, workmanship, finish, retail presentation and protective export packing are developed around the buyer’s collection.',
 };
+const foodAndAgricultureImages: Record<
+  string,
+  { image: string; imageAlt: string }
+> = {
+  'spices-blended-assorted': {
+    image: '/images/products/spices-blended-assorted.webp',
+    imageAlt:
+      'Assortment of ground and whole Indian spices in bowls on a wooden table',
+  },
+  'basmati-rice': {
+    image: '/images/products/basmati-rice.webp',
+    imageAlt: 'Long-grain basmati rice in a rustic sack with loose rice grains',
+  },
+  tea: {
+    image: '/images/products/tea.webp',
+    imageAlt: 'Dried tea leaves beside a cup of brewed tea',
+  },
+  coffee: {
+    image: '/images/products/coffee.webp',
+    imageAlt: 'Roasted coffee beans beside a rustic cup of black coffee',
+  },
+  'mango-pulp': {
+    image: '/images/products/mango-pulp.webp',
+    imageAlt: 'Golden mango pulp in a bowl with fresh ripe mangoes',
+  },
+  'organic-food-products': {
+    image: '/images/products/organic-food-products.webp',
+    imageAlt: 'Assorted organic grains, pulses and fresh vegetables',
+  },
+  'fresh-grapes': {
+    image: '/images/products/fresh-grapes.webp',
+    imageAlt: 'Bunches of fresh green grapes on a rustic wooden table',
+  },
+  pomegranates: {
+    image: '/images/products/pomegranates.webp',
+    imageAlt: 'Whole and cut ripe pomegranates with visible seeds',
+  },
+  turmeric: {
+    image: '/images/products/turmeric.webp',
+    imageAlt: 'Ground turmeric powder with fresh turmeric roots',
+  },
+  chilli: {
+    image: '/images/products/chilli.webp',
+    imageAlt: 'Dried red chillies in a rustic woven basket',
+  },
+  cumin: {
+    image: '/images/products/cumin.webp',
+    imageAlt: 'Whole cumin seeds in a wooden bowl',
+  },
+  'coriander-seed': {
+    image: '/images/products/coriander-seed.webp',
+    imageAlt: 'Whole coriander seeds in a wooden bowl',
+  },
+  cardamom: {
+    image: '/images/products/cardamom.webp',
+    imageAlt: 'Green cardamom pods in a wooden bowl',
+  },
+  'black-pepper': {
+    image: '/images/products/black-pepper.webp',
+    imageAlt: 'Whole black peppercorns in a wooden bowl',
+  },
+  ginger: {
+    image: '/images/products/ginger.webp',
+    imageAlt: 'Fresh whole and sliced ginger roots',
+  },
+  garlic: {
+    image: '/images/products/garlic.webp',
+    imageAlt: 'Whole garlic bulbs and separated garlic cloves',
+  },
+  onion: {
+    image: '/images/products/onion.webp',
+    imageAlt: 'Natural Indian red onions with one halved onion',
+  },
+  groundnuts: {
+    image: '/images/products/groundnuts.webp',
+    imageAlt: 'Shelled groundnuts with groundnut pods',
+  },
+};
 /** Catalogue governance: MOQ must be confirmed before quotation; packaging is specification-dependent; certifications must not be claimed without documentary proof; regulated products require destination-specific verification. */
 export const products: Product[] = seeds.map((seed) => {
   const profile = profiles[seed.category];
+  const productImage = foodAndAgricultureImages[seed.slug];
   return {
     ...seed,
     shortDescription: `India-origin ${seed.name.toLowerCase()} sourcing for ${profile.buyers}.`,
     description: `Biswas Exports coordinates B2B enquiries for ${seed.name.toLowerCase()} from India. ${categoryNarrative[seed.category]} Final specifications, documentation and packing are confirmed before quotation, and availability remains subject to the agreed buyer brief.`,
-    image: `/images/products/${seed.slug}.svg`,
-    imageAlt: `Neutral catalogue illustration representing ${seed.name}`,
+    image: productImage?.image ?? `/images/products/${seed.slug}.svg`,
+    imageAlt:
+      productImage?.imageAlt ??
+      `Neutral catalogue illustration representing ${seed.name}`,
     packagingOptions: profile.packagingOptions,
     moq: profile.moq,
     origin: 'India',
