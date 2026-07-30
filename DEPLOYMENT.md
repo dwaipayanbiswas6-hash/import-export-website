@@ -5,7 +5,7 @@ This project is the Next.js App Router frontend for Biswas Exports, prepared for
 ## 1. Prerequisites
 
 - Node.js 20.11 or newer.
-- npm 11 or compatible npm version.
+- npm 10 or a compatible npm version.
 - A GitHub repository containing this project.
 - A Vercel account connected to the GitHub organization or user that owns the repository.
 

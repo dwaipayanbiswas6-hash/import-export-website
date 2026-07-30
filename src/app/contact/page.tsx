@@ -189,7 +189,7 @@ export default function ContactPage() {
                         htmlFor={field.name}
                       >
                         {field.label}
-                        {field.required ? (
+                        {'required' in field && field.required ? (
                           <span className="text-gold"> *</span>
                         ) : null}
                       </label>

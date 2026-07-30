@@ -16,6 +16,13 @@ import {
   UsersRound,
 } from 'lucide-react';
 
+const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+const siteUrl =
+  configuredSiteUrl?.startsWith('http://') ||
+  configuredSiteUrl?.startsWith('https://')
+    ? configuredSiteUrl.replace(/\/$/, '')
+    : 'http://localhost:3000';
+
 export const siteConfig = {
   name: 'Biswas Exports',
   tagline: 'Bridging Indian Excellence to Global Markets',
@@ -28,7 +35,7 @@ export const siteConfig = {
   email: 'dwaipayanbiswas6@gmail.com',
   emailHref: 'mailto:dwaipayanbiswas6@gmail.com',
   location: 'Asansol, West Bengal, India',
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000',
+  url: siteUrl,
 };
 
 export const navItems = [
