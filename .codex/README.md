@@ -1,1 +1,0 @@
-Use the repository root file `TEXTILE_IMAGE_INTEGRATION_INSTRUCTIONS.md` as the task specification. Implement it fully, run all listed checks, and remove both instruction files before finalizing the branch.
