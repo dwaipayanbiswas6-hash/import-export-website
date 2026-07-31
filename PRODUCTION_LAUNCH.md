@@ -1,120 +1,160 @@
 # Biswas Exports — Phase 2 Production Launch
 
-This runbook is the final checklist for the catalogue and enquiry website.
+The enquiry database and Buyer Portal are the primary records. Email is used for passwordless sign-in and optional notifications; an enquiry must not be lost merely because a notification fails.
 
-## 1. Confirm public business information
+## 1. Confirm public and administrator details
 
-Approve the exact values before adding them to Vercel:
+Approve these values before adding them to Vercel:
 
 - Final public domain
-- Public business email
-- Enquiry-receiving inbox
-- Resend sender address
-- Reply-to address
-- Public phone number, if it should be shown
-- Public WhatsApp number, if it should be shown
+- Public business email, if displayed
+- Administrator business email or comma-separated emails
+- Public phone and WhatsApp numbers, if displayed
 - Response-time wording that does not create an unconditional guarantee
 - Optional legal name and registration disclosure supported by records
 
-Do not place API keys or other secrets in GitHub, source files, screenshots or public environment variables.
+Do not place API keys, service-role keys or private inbox details in GitHub, screenshots or public environment variables.
 
-## 2. Connect and verify the domain
+## 2. Create the Supabase project
 
-1. Add the final domain to the Vercel project.
-2. Apply the DNS records shown by Vercel at the domain registrar.
-3. Confirm the apex domain and preferred `www` behaviour.
-4. Wait until Vercel reports that the domain and SSL certificate are valid.
-5. Set `NEXT_PUBLIC_SITE_URL` to the final HTTPS origin with no trailing slash.
-6. Keep `NEXT_PUBLIC_ALLOW_INDEXING=false` until all launch tests pass.
+1. Create a Supabase project in the preferred region.
+2. Open **Project Settings → API**.
+3. Copy the project URL and publishable key.
+4. Copy the service-role key separately and treat it as a secret.
+5. Never expose the service-role key with a `NEXT_PUBLIC_` prefix.
 
-Preview deployments must remain non-indexable.
+## 3. Install the database and private storage schema
 
-## 3. Verify the Resend sending domain
-
-1. Add the chosen sending domain or subdomain in Resend.
-2. Add every DNS record supplied by Resend.
-3. Wait until the sending domain is verified.
-4. Create a sender such as `Biswas Exports <enquiries@yourdomain.com>`.
-5. Create or select the inbox that will receive buyer enquiries.
-6. Generate a production API key and store it only in Vercel.
-
-The public website email, enquiry inbox and sender email can be different, but each role must be intentional and monitored.
-
-## 4. Add Vercel Production environment variables
-
-Required:
+Open **Supabase → SQL Editor** and run:
 
 ```text
-NEXT_PUBLIC_SITE_URL=https://your-final-domain.com
+supabase/migrations/202608010001_buyer_portal.sql
+```
+
+The migration creates:
+
+- `enquiries`
+- `enquiry_messages`
+- Buyer row-level security policies
+- A function that links enquiries to the verified buyer account
+- A private `enquiry-files` storage bucket
+- Status and activity-update triggers
+
+After running it, confirm that RLS is enabled on both public tables and that the storage bucket is private.
+
+## 4. Configure passwordless business-email authentication
+
+In **Supabase → Authentication → URL Configuration**:
+
+1. Set the Site URL to the final HTTPS website origin.
+2. Add the final callback URL:
+
+```text
+https://your-domain.com/portal/callback
+```
+
+3. During preview testing, add only the exact Vercel preview callback being tested.
+4. Remove obsolete preview redirects after launch.
+
+Email authentication and Magic Links must be enabled. The default Supabase email sender can be used for limited setup testing. Configure a production SMTP provider before inviting real buyers so delivery, sender identity and limits are suitable for business use.
+
+The project also includes `/auth/confirm` for a future server-side token-hash email template. The default flow currently returns through `/portal/callback` and creates a cookie-based portal session.
+
+## 5. Add Vercel environment variables
+
+Required for the database-first portal:
+
+```text
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
 NEXT_PUBLIC_ALLOW_INDEXING=false
-RESEND_API_KEY=your-secret-key
-CONTACT_TO_EMAIL=your-monitored-inbox@example.com
-CONTACT_FROM_EMAIL=Biswas Exports <enquiries@your-verified-domain.com>
-CONTACT_REPLY_TO_EMAIL=your-reply-address@example.com
-NEXT_PUBLIC_CONTACT_EMAIL=your-public-email@example.com
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+SUPABASE_SERVICE_ROLE_KEY=your-secret-service-role-key
+PORTAL_ADMIN_EMAILS=your-admin@company.com
 NEXT_PUBLIC_CONTACT_RESPONSE_TIME=Your approved response-time wording
 ```
 
-Optional:
+Optional public details:
 
 ```text
+NEXT_PUBLIC_CONTACT_EMAIL=
 NEXT_PUBLIC_CONTACT_PHONE=
 NEXT_PUBLIC_WHATSAPP_NUMBER=
 NEXT_PUBLIC_LEGAL_NAME=
 NEXT_PUBLIC_REGISTRATION_LINE=
 ```
 
-Use the Production environment for final values. Preview values may be omitted or replaced with non-public test addresses. Never expose `RESEND_API_KEY` through a `NEXT_PUBLIC_` variable.
+Optional Resend notifications:
 
-## 5. Validate configuration
+```text
+RESEND_API_KEY=
+CONTACT_TO_EMAIL=
+CONTACT_FROM_EMAIL=Biswas Exports <enquiries@your-verified-domain.com>
+CONTACT_REPLY_TO_EMAIL=
+```
 
-With the production variables loaded, run:
+Resend is not required to store enquiries or portal messages. Configure all four Resend variables together or leave them blank.
+
+Use real secrets only in the Vercel Production environment. Preview deployments can use a separate Supabase test project or remain unconfigured.
+
+## 6. Deploy and validate configuration
+
+After adding the variables, redeploy the project and run:
 
 ```bash
 npm run launch:check
 ```
 
-The check validates the required domain and contact configuration without printing secret values.
+The validator checks the domain, Supabase settings, administrator emails and optional Resend group without printing secret values.
 
-## 6. Test the complete enquiry flow
+## 7. Test the complete buyer journey
 
-Complete at least these production tests:
+1. Submit a valid enquiry without an attachment.
+2. Confirm the success page displays an enquiry reference.
+3. Confirm the row appears in Supabase and `/admin/enquiries`.
+4. Confirm the buyer receives a Magic Link from Supabase Auth.
+5. Open the link and verify `/portal` shows only enquiries for that business email.
+6. Open the enquiry and post a buyer reply.
+7. Sign in with an email that has no enquiry and confirm no data is exposed.
+8. Submit a PDF below 10 MB and confirm the private file can be opened only through a temporary signed link.
+9. Try an unsupported file and a file over 10 MB; both must be rejected.
+10. Confirm repeated enquiry and login requests are rate-limited.
 
-1. Submit a normal enquiry without an attachment.
-2. Confirm the owner inbox receives the enquiry.
-3. Confirm the buyer receives the acknowledgement and enquiry reference.
-4. Reply to the acknowledgement and confirm it reaches the configured reply-to inbox.
-5. Submit an enquiry with an approved PDF attachment below 10 MB.
-6. Confirm the attachment arrives and its filename is safe.
-7. Try an invalid file type and a file over 10 MB; both must be rejected.
-8. Try invalid fields and confirm useful validation messages appear.
-9. Confirm repeated rapid submissions are rate-limited.
-10. Confirm no enquiry data or API key appears in browser source, logs or public pages.
+## 8. Test the administrator workflow
 
-The built-in rate limiter is a basic per-instance safeguard. A shared durable rate-limit store should be added later if abuse becomes material.
+1. Sign in using an email listed in `PORTAL_ADMIN_EMAILS`.
+2. Open `/admin/enquiries` and confirm all enquiries are visible.
+3. Open one enquiry and change its status.
+4. Post a response and optional document.
+5. Confirm the buyer can read the response after portal login.
+6. Confirm a non-admin authenticated buyer is redirected away from admin routes.
+7. Confirm service-role keys and other secrets never appear in browser source or network responses.
 
-## 7. Final site checks
+## 9. Test optional email notifications
 
-- Check homepage, catalogue, every category filter and representative product pages.
-- Check Contact, Privacy Policy and Terms pages.
-- Check mobile, tablet and desktop layouts.
-- Check keyboard navigation and visible focus states.
-- Confirm all 87 images load.
-- Confirm `robots.txt` blocks indexing while `NEXT_PUBLIC_ALLOW_INDEXING=false`.
-- Confirm canonical URLs and the sitemap use the final domain.
-- Confirm security headers are present.
-- Confirm Vercel production deployment and GitHub CI both pass.
+When Resend is configured:
 
-## 8. Enable public indexing
+1. Confirm the administrator receives a new-enquiry alert.
+2. Confirm the buyer receives a response-available notification after an admin portal reply.
+3. Confirm a Resend failure does not remove or reject the saved enquiry or message.
 
-Only after all tests pass:
+## 10. Connect the final domain and security checks
 
-1. Set `NEXT_PUBLIC_ALLOW_INDEXING=true` in the Vercel Production environment.
-2. Redeploy production.
-3. Confirm `robots.txt` allows crawling and lists the final sitemap.
-4. Confirm page metadata no longer contains `noindex`.
-5. Submit the sitemap to the selected search-engine webmaster tools during Phase 4.
+1. Add the domain to Vercel and apply the DNS records.
+2. Wait for a valid SSL certificate.
+3. Confirm canonical URLs, sitemap and robots configuration use the final domain.
+4. Confirm security headers are present.
+5. Check mobile, tablet, desktop and keyboard navigation.
+6. Confirm all 87 product images and representative product pages load.
+7. Confirm Privacy Policy and Terms describe portal storage and authentication.
+
+## 11. Enable indexing only after portal acceptance
+
+1. Keep `NEXT_PUBLIC_ALLOW_INDEXING=false` throughout setup and testing.
+2. After every production test passes, set it to `true`.
+3. Redeploy production.
+4. Confirm `robots.txt` allows crawling and page metadata no longer contains `noindex`.
 
 ## Phase 2 completion rule
 
-Phase 2 is complete only when the final domain works, the production environment passes `npm run launch:check`, a real enquiry and acknowledgement have both been delivered successfully, and the approved public contact details are visible and accurate.
+Phase 2 is operationally complete only when the final domain works, the Supabase migration is installed, a real enquiry is stored, the buyer can sign in and view the response, the administrator can reply from the private inbox, private files remain protected, and all approved public details are accurate.
