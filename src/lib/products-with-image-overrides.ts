@@ -7,7 +7,7 @@ import {
   type ProductSpecification,
 } from './products';
 
-const textileImageOverrides: Record<
+const imageOverrides: Record<
   string,
   Pick<Product, 'image' | 'imageAlt'>
 > = {
@@ -39,10 +39,62 @@ const textileImageOverrides: Record<
     image: '/images/products/plant-fibre-carpets-rugs.webp',
     imageAlt: 'Woven plant-fibre rugs with natural and geometric patterns',
   },
+  fasteners: {
+    image: '/images/products/fasteners.webp',
+    imageAlt: 'Assorted threaded fasteners, washers, screws and hex nuts',
+  },
+  'nuts-and-bolts': {
+    image: '/images/products/nuts-and-bolts.webp',
+    imageAlt: 'Assorted steel nuts and threaded bolts on a dark work surface',
+  },
+  'pipe-fittings': {
+    image: '/images/products/pipe-fittings.webp',
+    imageAlt: 'Assorted threaded metal pipe elbows, couplings and connectors',
+  },
+  'steel-fabrication': {
+    image: '/images/products/steel-fabrication.webp',
+    imageAlt: 'Fabricated structural steel frame for an industrial building',
+  },
+  'aluminium-products': {
+    image: '/images/products/aluminium-products.webp',
+    imageAlt: 'Stacked extruded aluminium profiles in multiple cross-sections',
+  },
+  'brass-fittings': {
+    image: '/images/products/brass-fittings.webp',
+    imageAlt: 'Assorted polished brass threaded fittings and connectors',
+  },
+  'industrial-valves': {
+    image: '/images/products/industrial-valves.webp',
+    imageAlt: 'Assorted flanged industrial valves with handwheel controls',
+  },
+  bearings: {
+    image: '/images/products/bearings.webp',
+    imageAlt: 'Assorted precision ball bearings in multiple industrial sizes',
+  },
+  'industrial-castings': {
+    image: '/images/products/industrial-castings.webp',
+    imageAlt: 'Assorted unfinished metal industrial castings and housings',
+  },
+  'machine-components': {
+    image: '/images/products/machine-components.webp',
+    imageAlt: 'Precision-machined shafts, gears, couplings and flanged components',
+  },
+  'synthetic-rubber-products': {
+    image: '/images/products/synthetic-rubber-products.webp',
+    imageAlt: 'Assorted black synthetic rubber sheets, hoses, seals and O-rings',
+  },
+  'industrial-tools': {
+    image: '/images/products/industrial-tools.webp',
+    imageAlt: 'Power tools and heavy-duty workshop tools arranged on a bench',
+  },
+  'hand-tools': {
+    image: '/images/products/hand-tools.webp',
+    imageAlt: 'Assorted hand tools including spanners, sockets, pliers and screwdrivers',
+  },
 };
 
 export const products: Product[] = baseProducts.map((product) => {
-  const override = textileImageOverrides[product.slug];
+  const override = imageOverrides[product.slug];
   return override ? { ...product, ...override } : product;
 });
 
