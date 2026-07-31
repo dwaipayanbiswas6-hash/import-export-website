@@ -28,10 +28,10 @@ export default function Page() {
           <p>
             Portal access is linked to the verified business email used for an
             enquiry. A one-time email link may be used instead of a password. You
-            must not forward a sign-in link, attempt to access another buyer's
-            records, impersonate another person or company, or bypass access
-            controls. You are responsible for protecting access to your business
-            email account and for signing out on shared devices.
+            must not forward a sign-in link, attempt to access records belonging
+            to another buyer, impersonate another person or company, or bypass
+            access controls. You are responsible for protecting access to your
+            business email account and for signing out on shared devices.
           </p>
           <p>
             Portal status labels, messages and uploaded documents are business
