@@ -19,6 +19,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@supabase/ssr": "0.12.3",
+    "@supabase/supabase-js": "2.110.8",
     "framer-motion": "12.43.0",
     "lucide-react": "1.27.0",
     "next": "16.2.12",
