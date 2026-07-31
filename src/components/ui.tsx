@@ -108,11 +108,6 @@ export function Navbar() {
   const [mega, setMega] = useState(false);
 
   useEffect(() => {
-    setOpen(false);
-    setMega(false);
-  }, [pathname]);
-
-  useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setOpen(false);
@@ -137,6 +132,10 @@ export function Navbar() {
           className="whitespace-nowrap font-display text-xl font-bold tracking-tight sm:text-2xl"
           href="/"
           aria-label="Biswas Exports home"
+          onClick={() => {
+            setOpen(false);
+            setMega(false);
+          }}
         >
           Biswas <span className="text-[color:var(--gold)]">Exports</span>
         </Link>
@@ -159,6 +158,7 @@ export function Navbar() {
                     aria-current={isCurrent(item.href) ? 'page' : undefined}
                     className="nav-link"
                     href={item.href}
+                    onClick={() => setMega(false)}
                   >
                     Products
                   </Link>
@@ -187,6 +187,7 @@ export function Navbar() {
                         className="rounded-2xl p-4 transition hover:bg-[color:var(--cream)] focus-visible:bg-[color:var(--cream)]"
                         href="/products"
                         key={product.title}
+                        onClick={() => setMega(false)}
                       >
                         <b>{product.title}</b>
                         <p className="mt-1 line-clamp-2 text-sm text-[color:var(--muted)]">
@@ -203,13 +204,18 @@ export function Navbar() {
                 className="nav-link"
                 href={item.href}
                 key={item.href}
+                onClick={() => setMega(false)}
               >
                 {item.label}
               </Link>
             ),
           )}
         </div>
-        <Link className="button-primary hidden lg:inline-flex" href="/contact">
+        <Link
+          className="button-primary hidden lg:inline-flex"
+          href="/contact"
+          onClick={() => setMega(false)}
+        >
           Request a quote
         </Link>
         <button
