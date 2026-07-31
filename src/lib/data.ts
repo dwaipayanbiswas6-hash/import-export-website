@@ -19,7 +19,6 @@ import {
 export const company = {
   name: 'Biswas Exports',
   tagline: 'Indian products. Global possibilities.',
-  email: 'contact@biswasexports.com',
   address: 'Asansol, West Bengal, India',
 };
 
@@ -37,76 +36,76 @@ export const products = [
     title: 'Agricultural Products',
     icon: Wheat,
     description:
-      'Carefully selected grains, pulses, spices, and agricultural produce prepared for international trade.',
+      'India-focused sourcing enquiries for grains, spices and agricultural produce, subject to specification and supplier verification.',
   },
   {
     title: 'Textiles & Apparel',
     icon: Shirt,
     description:
-      'Quality Indian fabrics, finished textiles, and apparel sourced to match buyer specifications.',
+      'Fabrics, finished textiles and apparel considered against buyer specifications, quantities and destination requirements.',
   },
   {
     title: 'Handicrafts & Home Décor',
     icon: Sparkles,
     description:
-      'Distinctive craft-led collections that celebrate Indian materials, artistry, and contemporary utility.',
+      'Craft-led home and lifestyle categories reviewed for material, workmanship, finish and export-packing requirements.',
   },
   {
     title: 'Industrial Goods',
     icon: Factory,
     description:
-      'Dependable components, tools, and manufactured goods supported by clear specifications.',
+      'Components, tools and manufactured goods assessed against drawings, grades, tolerances and required documentation.',
   },
   {
     title: 'Consumer Products',
     icon: Boxes,
     description:
-      'Thoughtfully sourced everyday products with market-ready packaging and documentation.',
+      'Consumer-product enquiries reviewed for composition, packaging, labelling and destination-market requirements.',
   },
   {
     title: 'Custom Sourcing',
     icon: Search,
     description:
-      'Buyer-led sourcing for suitable Indian products, manufacturers, and commercial requirements.',
+      'Buyer-led review of products and potential Indian supply options not already represented in the catalogue.',
   },
 ];
 
 export const services = [
   {
-    title: 'Product Sourcing',
+    title: 'Product Sourcing Review',
     icon: Search,
     description:
-      'Requirement-led supplier and product discovery across trusted Indian manufacturing ecosystems.',
+      'Review of buyer requirements and potential Indian product or supplier options, subject to independent verification.',
   },
   {
-    title: 'Quality Coordination',
+    title: 'Specification Coordination',
     icon: ClipboardCheck,
     description:
-      'Specification alignment, sample coordination, and practical quality checkpoints before dispatch.',
+      'Alignment of buyer specifications, samples and practical checkpoints before commercial terms are agreed.',
   },
   {
-    title: 'Export Documentation',
+    title: 'Documentation Coordination',
     icon: FileCheck2,
     description:
-      'Structured commercial and shipping documentation coordinated for each agreed transaction.',
+      'Identification and coordination of transaction documents required by the agreed product, route and destination.',
   },
   {
-    title: 'Packaging Support',
+    title: 'Packaging Review',
     icon: PackageCheck,
     description:
-      'Export-ready packaging guidance shaped around product protection, presentation, and transit needs.',
+      'Discussion of product protection, presentation and transit requirements with the selected supply parties.',
   },
   {
-    title: 'Logistics Coordination',
+    title: 'Logistics Handover',
     icon: Ship,
     description:
-      'Clear handoffs with logistics providers for suitable ocean, air, and multimodal movement.',
+      'Coordination with appointed logistics providers after responsibilities, documents and commercial terms are agreed.',
   },
   {
     title: 'Buyer Communication',
     icon: Handshake,
     description:
-      'Responsive, transparent communication from initial enquiry through order coordination.',
+      'Documented communication from the initial enquiry through the agreed sourcing or transaction stage.',
   },
 ];
 
@@ -115,25 +114,25 @@ export const industries = [
     title: 'Agriculture & Food',
     icon: Leaf,
     description:
-      'Sourcing and export coordination for suitable agricultural and food categories.',
+      'Enquiry review for suitable agricultural and food categories, including destination-specific product and labelling requirements.',
   },
   {
     title: 'Textiles & Lifestyle',
     icon: Shirt,
     description:
-      'Flexible product development and sourcing for textile, apparel, and lifestyle buyers.',
+      'Specification-led enquiries for textile, apparel, home and lifestyle categories.',
   },
   {
     title: 'Manufacturing',
     icon: Factory,
     description:
-      'Specification-led coordination for industrial and manufactured product requirements.',
+      'Drawing- and specification-led coordination for industrial and manufactured product requirements.',
   },
   {
     title: 'Retail & Distribution',
     icon: Boxes,
     description:
-      'Curated supply options for importers, distributors, retailers, and private-label programmes.',
+      'Product and packaging enquiries from importers, distributors, retailers and private-label buyers.',
   },
 ];
 
@@ -141,22 +140,22 @@ export const workflow = [
   {
     step: '01',
     title: 'Understand',
-    text: 'We clarify your product, quantity, specification, destination, and timeline.',
+    text: 'Clarify the product, quantity, specification, destination, buyer status and timeline.',
   },
   {
     step: '02',
-    title: 'Source',
-    text: 'We identify suitable supply options and coordinate samples or commercial details.',
+    title: 'Review',
+    text: 'Assess the enquiry and identify potential supply routes or information gaps.',
   },
   {
     step: '03',
-    title: 'Prepare',
-    text: 'We align quality, packaging, and required export documentation.',
+    title: 'Verify',
+    text: 'Confirm relevant supplier, specification, packaging, documentation and compliance details.',
   },
   {
     step: '04',
-    title: 'Dispatch',
-    text: 'We coordinate a clear logistics handover and keep communication moving.',
+    title: 'Coordinate',
+    text: 'Proceed only after written agreement on commercial terms, responsibilities and next steps.',
   },
 ];
 
@@ -164,17 +163,17 @@ export const values = [
   {
     title: 'Clarity at every step',
     icon: Route,
-    text: 'Straightforward updates, documented requirements, and responsive coordination.',
+    text: 'Straightforward updates, documented requirements and clearly stated dependencies.',
   },
   {
-    title: 'Quality-minded sourcing',
+    title: 'Verification-minded sourcing',
     icon: ShieldCheck,
-    text: 'Products and supply options considered against the buyer’s stated needs.',
+    text: 'Products and supply options are reviewed against the buyer brief before claims are repeated or relied upon.',
   },
   {
-    title: 'Global trade perspective',
+    title: 'International buyer perspective',
     icon: Globe2,
-    text: 'Export preparation shaped for the practical expectations of international buyers.',
+    text: 'Enquiries are considered in light of the destination, intended use and agreed transaction responsibilities.',
   },
 ];
 
