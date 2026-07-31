@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { BusinessDisclosure } from '@/components/business-disclosure';
 import { Chrome, Footer, Navbar } from '@/components/ui';
 import { allowIndexing, siteUrl } from '@/lib/site';
 
@@ -41,6 +42,7 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <BusinessDisclosure />
         <Chrome />
       </body>
     </html>
