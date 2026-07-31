@@ -15,9 +15,7 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@/lib/products": [
-        "./src/lib/products-with-home-lifestyle-image-overrides.ts"
-      ],
+      "@/lib/products": ["./src/lib/products-verified.ts"],
       "@/*": ["./src/*"]
     }
   },
