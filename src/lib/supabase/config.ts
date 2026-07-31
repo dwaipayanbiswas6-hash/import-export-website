@@ -11,15 +11,6 @@ export function getSupabasePublicConfig() {
   return url && publishableKey ? { url, publishableKey } : null;
 }
 
-export function getSupabaseServiceConfig() {
-  const publicConfig = getSupabasePublicConfig();
-  const serviceRoleKey = configured(process.env.SUPABASE_SERVICE_ROLE_KEY);
-
-  return publicConfig && serviceRoleKey
-    ? { ...publicConfig, serviceRoleKey }
-    : null;
-}
-
 export function isSupabasePublicConfigured() {
   return Boolean(getSupabasePublicConfig());
 }
