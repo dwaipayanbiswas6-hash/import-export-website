@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Chrome, Footer, Navbar } from '@/components/ui';
+
 export const metadata: Metadata = {
   title: {
     default: 'Biswas Exports | Indian Products for Global Markets',
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
     type: 'website',
   },
 };
+
 export default function RootLayout({
   children,
 }: {
@@ -23,8 +25,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <a className="skip-link" href="#main-content">
+          Skip to main content
+        </a>
         <Navbar />
-        <main>{children}</main>
+        <main id="main-content" tabIndex={-1}>
+          {children}
+        </main>
         <Footer />
         <Chrome />
       </body>
