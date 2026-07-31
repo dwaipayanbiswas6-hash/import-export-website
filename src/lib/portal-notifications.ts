@@ -6,6 +6,15 @@ function configured(value: string | undefined) {
   return value?.trim() || null;
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
 function recipients() {
   return (process.env.CONTACT_TO_EMAIL ?? '')
     .split(',')
@@ -25,7 +34,7 @@ export async function sendPortalAccessLink(email: string, next = '/portal') {
     },
   });
 
-  const callback = `${siteUrl}/auth/confirm?next=${encodeURIComponent(next)}`;
+  const callback = `${siteUrl}/portal/callback?next=${encodeURIComponent(next)}`;
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
@@ -85,7 +94,7 @@ export async function notifyAdminOfEnquiry(input: {
     reply_to: input.buyerEmail,
     subject: `New portal enquiry ${input.reference} — ${input.companyName}`,
     text: `A new ${input.category} enquiry has been saved in the Biswas Exports portal.\n\nReference: ${input.reference}\nBuyer: ${input.companyName}\nBusiness email: ${input.buyerEmail}\n\nOpen the admin inbox: ${adminUrl}`,
-    html: `<p>A new <strong>${input.category}</strong> enquiry has been saved in the Biswas Exports portal.</p><p><strong>Reference:</strong> ${input.reference}<br><strong>Buyer:</strong> ${input.companyName}<br><strong>Business email:</strong> ${input.buyerEmail}</p><p><a href="${adminUrl}">Open the admin inbox</a></p>`,
+    html: `<p>A new <strong>${escapeHtml(input.category)}</strong> enquiry has been saved in the Biswas Exports portal.</p><p><strong>Reference:</strong> ${escapeHtml(input.reference)}<br><strong>Buyer:</strong> ${escapeHtml(input.companyName)}<br><strong>Business email:</strong> ${escapeHtml(input.buyerEmail)}</p><p><a href="${adminUrl}">Open the admin inbox</a></p>`,
   });
 }
 
@@ -105,6 +114,6 @@ export async function notifyBuyerOfResponse(input: {
     reply_to: replyTo,
     subject: `New response available — ${input.reference}`,
     text: `Biswas Exports has posted a response to enquiry ${input.reference}. Sign in with the same business email to view it: ${portalUrl}`,
-    html: `<p>Biswas Exports has posted a response to enquiry <strong>${input.reference}</strong>.</p><p><a href="${portalUrl}">Sign in to view the response</a></p>`,
+    html: `<p>Biswas Exports has posted a response to enquiry <strong>${escapeHtml(input.reference)}</strong>.</p><p><a href="${portalUrl}">Sign in to view the response</a></p>`,
   });
 }
