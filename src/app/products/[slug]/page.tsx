@@ -1,9 +1,16 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Check, PackageCheck } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  PackageCheck,
+  ShieldAlert,
+} from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { ProductCard } from '@/components/catalogue/product-card';
+import { getCatalogueNotices } from '@/lib/catalogue-notices';
 import {
   getAllProductSlugs,
   getProductBySlug,
@@ -38,6 +45,7 @@ export default async function ProductPage({ params }: Props) {
   const product = getProductBySlug(slug);
   if (!product) notFound();
   const related = getRelatedProducts(product);
+  const notices = getCatalogueNotices(product);
   const quoteHref = `/contact?product=${encodeURIComponent(product.slug)}`;
   const structuredData = {
     '@context': 'https://schema.org',
@@ -45,9 +53,19 @@ export default async function ProductPage({ params }: Props) {
     name: product.name,
     description: product.shortDescription,
     image: product.image,
-    brand: { '@type': 'Brand', name: 'Biswas Exports' },
-    countryOfOrigin: { '@type': 'Country', name: 'India' },
     category: product.category,
+    additionalProperty: [
+      {
+        '@type': 'PropertyValue',
+        name: 'Catalogue status',
+        value: 'Indicative B2B sourcing category',
+      },
+      {
+        '@type': 'PropertyValue',
+        name: 'Sourcing focus',
+        value: product.origin,
+      },
+    ],
   };
 
   return (
@@ -82,15 +100,21 @@ export default async function ProductPage({ params }: Props) {
         </div>
       </div>
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-6 sm:py-16 lg:grid-cols-2 lg:gap-12 lg:px-8 lg:py-24">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--cream)] shadow-xl sm:rounded-[2.5rem]">
-          <Image
-            src={product.image}
-            alt={product.imageAlt}
-            fill
-            priority
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover"
-          />
+        <div>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--cream)] shadow-xl sm:rounded-[2.5rem]">
+            <Image
+              src={product.image}
+              alt={product.imageAlt}
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+            />
+          </div>
+          <p className="mt-3 text-center text-xs leading-5 text-[color:var(--muted)]">
+            Illustrative catalogue image. It does not show confirmed Biswas
+            Exports inventory, supplier packaging or an actual shipment.
+          </p>
         </div>
         <div className="self-center">
           <p className="eyebrow">{product.category}</p>
@@ -103,7 +127,7 @@ export default async function ProductPage({ params }: Props) {
           <dl className="mt-7 grid gap-4 border-y border-[color:var(--line)] py-6 sm:mt-8 sm:grid-cols-2">
             <div>
               <dt className="text-sm font-semibold text-[color:var(--muted)]">
-                Origin
+                Sourcing focus
               </dt>
               <dd className="mt-1 text-lg font-semibold">{product.origin}</dd>
             </div>
@@ -116,6 +140,10 @@ export default async function ProductPage({ params }: Props) {
               </dd>
             </div>
           </dl>
+          <p className="mt-4 text-sm leading-6 text-[color:var(--muted)]">
+            Minimum order information is indicative and must be reconfirmed for
+            the selected specification, supplier and packaging format.
+          </p>
           <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
             <Link className="button-primary w-full sm:w-auto" href={quoteHref}>
               Request quote <ArrowRight size={18} />
@@ -129,6 +157,36 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      <section className="mx-auto max-w-7xl px-5 pb-16 sm:px-6 sm:pb-20 lg:px-8">
+        <div className="rounded-[1.5rem] border border-[color:var(--gold-soft)] bg-[color:var(--cream)] p-6 sm:rounded-[2rem] sm:p-8">
+          <div className="flex items-start gap-4">
+            <ShieldAlert
+              aria-hidden="true"
+              className="mt-1 shrink-0 text-[color:var(--gold-dark)]"
+              size={26}
+            />
+            <div>
+              <p className="eyebrow">Catalogue status</p>
+              <h2 className="text-2xl font-semibold sm:text-3xl">
+                Verification required before quotation or reliance
+              </h2>
+              <ul className="mt-5 grid gap-3 leading-7 text-[color:var(--muted)]">
+                {notices.map((notice) => (
+                  <li className="flex gap-3" key={notice}>
+                    <span
+                      aria-hidden="true"
+                      className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--gold)]"
+                    />
+                    <span>{notice}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="section-tint">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.15fr_.85fr] lg:gap-12 lg:px-8">
           <div>
@@ -168,8 +226,9 @@ export default async function ProductPage({ params }: Props) {
               ))}
             </ul>
             <p className="mt-5 text-sm leading-6 text-[color:var(--muted)]">
-              Packaging can be discussed based on product specification, order
-              volume, transit conditions and destination rules.
+              Packaging remains subject to product specification, selected
+              supplier capability, order volume, transit conditions and
+              destination rules.
             </p>
           </div>
         </div>
@@ -205,8 +264,9 @@ export default async function ProductPage({ params }: Props) {
                 <li key={note}>{note}</li>
               ))}
               <li>
-                Final specifications, packaging, documentation, lead time and
-                commercial terms are confirmed in writing before an order.
+                Final specifications, selected supply parties, packaging,
+                documentation, lead time, responsibilities and commercial terms
+                are confirmed in writing before an order.
               </li>
             </ul>
           </div>

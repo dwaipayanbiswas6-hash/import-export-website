@@ -17,16 +17,16 @@ export default function Home() {
             initial={{ opacity: 0, y: 26 }}
             transition={{ duration: 0.8 }}
           >
-            <p className="eyebrow">From India to the world</p>
+            <p className="eyebrow">From India to international buyers</p>
             <h1 className="max-w-4xl text-5xl font-semibold leading-[1.04] tracking-tight md:text-7xl">
-              Trusted exports.
+              India-focused sourcing.
               <br />
-              <span className="gold-text">Exceptional standards.</span>
+              <span className="gold-text">Clear coordination.</span>
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-[color:var(--muted)]">
-              Biswas Exports connects international buyers with carefully
-              sourced Indian products through responsive communication,
-              thoughtful coordination, and export-ready execution.
+              Biswas Exports reviews professional buyer requirements and
+              coordinates potential Indian product and supply options through
+              documented communication and specification-led enquiry handling.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <Link className="button-primary" href="/contact">
@@ -50,15 +50,16 @@ export default function Home() {
             <div className="hero-panel-inner">
               <Globe2 className="text-[color:var(--gold)]" size={34} />
               <p className="mt-24 text-sm uppercase tracking-[.26em] text-[color:var(--gold)]">
-                Purposeful global trade
+                Structured B2B enquiries
               </p>
               <h2 className="mt-4 font-display text-4xl leading-tight">
-                Indian quality, prepared for international opportunity.
+                Buyer requirements, supply details and responsibilities aligned
+                before commitment.
               </h2>
               <div className="mt-10 h-px bg-gradient-to-r from-[color:var(--gold)] to-transparent" />
               <p className="mt-5 text-[color:var(--muted)]">
-                Sourcing · Quality coordination · Documentation · Logistics
-                support
+                Requirement review · Supplier verification · Documentation ·
+                Logistics handover
               </p>
             </div>
           </motion.div>
@@ -67,8 +68,8 @@ export default function Home() {
 
       <Section
         eyebrow="Product portfolio"
-        title="Distinctive Indian products, selected with care."
-        intro="Explore representative categories or speak with us about a specific sourcing requirement."
+        title="Indicative India-focused product categories."
+        intro="The catalogue is a starting point for professional sourcing enquiries, not a statement of current stock, certification, price or manufacturer appointment."
       >
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => (
@@ -89,7 +90,7 @@ export default function Home() {
       <div className="section-tint">
         <Section
           eyebrow="Why Biswas Exports"
-          title="A refined approach to every export opportunity."
+          title="A disciplined approach to each export enquiry."
         >
           <div className="mt-12 grid gap-5 md:grid-cols-3">
             {values.map((value) => (
@@ -107,8 +108,8 @@ export default function Home() {
 
       <Section
         eyebrow="Our process"
-        title="A clear path from enquiry to dispatch."
-        intro="Every engagement is shaped around the product, destination, commercial terms, and buyer requirements."
+        title="A clear process from enquiry to an agreed next step."
+        intro="Progress depends on the product, supplier verification, destination requirements, commercial terms and each party’s written responsibilities."
       >
         <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {workflow.map((item) => (
@@ -126,8 +127,8 @@ export default function Home() {
       </Section>
 
       <Section
-        eyebrow="Industries served"
-        title="Flexible expertise for diverse buyer needs."
+        eyebrow="Buyer sectors"
+        title="Commercial contexts considered across the catalogue."
       >
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
           {industries.map((industry) => (
@@ -145,14 +146,14 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-6 pb-24 lg:px-8">
         <Reveal className="trade-banner">
           <div>
-            <p className="eyebrow">Global trade, personally coordinated</p>
+            <p className="eyebrow">International enquiries coordinated from India</p>
             <h2 className="max-w-3xl text-4xl font-semibold md:text-6xl">
-              Rooted in India. Ready for your market.
+              Rooted in India. Prepared to understand your market.
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-[color:var(--muted)]">
-              From our base in Asansol, we work with buyers seeking a dependable
-              point of contact for sourcing and exporting suitable Indian
-              products.
+              From Asansol, West Bengal, we receive professional B2B enquiries
+              from buyers seeking a point of contact for potential Indian
+              sourcing opportunities.
             </p>
           </div>
           <Gem
@@ -171,8 +172,8 @@ export default function Home() {
             Tell us what you are looking to source from India.
           </h2>
           <p className="mt-6 max-w-2xl text-lg text-white/70">
-            Share your product, specification, quantity, destination, and
-            preferred timeline.
+            Share your product, specification, quantity, destination, buyer
+            status and preferred timeline.
           </p>
           <Link className="button-gold mt-9" href="/contact">
             Contact Biswas Exports <ArrowRight size={18} />

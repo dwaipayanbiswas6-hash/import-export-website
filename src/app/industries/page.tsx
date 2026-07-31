@@ -1,16 +1,22 @@
 import type { Metadata } from 'next';
 import { PageHero, PremiumCard, Section } from '@/components/ui';
 import { industries } from '@/lib/data';
+
 export const metadata: Metadata = { title: 'Industries' };
+
 export default function Page() {
   return (
     <>
       <PageHero
-        eyebrow="Industries"
-        title="Commercial understanding across diverse categories."
-        intro="We adapt sourcing and export coordination to the practical needs of each product category, buyer model, and destination."
+        eyebrow="Buyer sectors"
+        title="Commercial contexts represented across the catalogue."
+        intro="The catalogue spans product categories commonly considered by buyers in agriculture, food, textiles, lifestyle, manufacturing, retail and distribution."
       />
-      <Section eyebrow="Sectors" title="Focused on products with purpose.">
+      <Section
+        eyebrow="Enquiry contexts"
+        title="Specification-led review across diverse sectors."
+        intro="Industry references describe the types of enquiries considered. They do not claim completed projects, sector accreditation or guaranteed supply capability."
+      >
         <div className="mt-12 grid gap-5 md:grid-cols-2">
           {industries.map((industry) => (
             <PremiumCard key={industry.title}>

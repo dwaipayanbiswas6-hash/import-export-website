@@ -1,19 +1,21 @@
 import type { Metadata } from 'next';
 import { PageHero, PremiumCard, Section } from '@/components/ui';
 import { values } from '@/lib/data';
+
 export const metadata: Metadata = { title: 'About' };
+
 export default function Page() {
   return (
     <>
       <PageHero
         eyebrow="About Biswas Exports"
-        title="Trade built on clarity, care, and commercial purpose."
-        intro="Biswas Exports is an India-based export company helping international buyers discover and coordinate suitable Indian products from Asansol, West Bengal."
+        title="Trade enquiries handled with clarity, care and commercial purpose."
+        intro="Biswas Exports is an India-based export sourcing brand operating from Asansol, West Bengal. We review professional buyer requirements and coordinate potential Indian product and supply options."
       />
       <Section
         eyebrow="Our approach"
-        title="A considered partner for Indian sourcing."
-        intro="We bring together product discovery, requirement alignment, export preparation, and responsive communication in one focused relationship."
+        title="A considered point of contact for India-focused sourcing."
+        intro="Our scope brings together requirement review, potential supply identification, specification alignment, documentation coordination and responsive communication."
       >
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {values.map((value) => (
@@ -30,18 +32,24 @@ export default function Page() {
       <div className="section-tint">
         <Section
           eyebrow="What matters"
-          title="Thoughtful execution over empty claims."
+          title="Verification before representation."
         >
           <div className="mt-10 max-w-4xl text-lg leading-8 text-[color:var(--muted)]">
             <p>
-              Every enquiry begins with listening. We seek to understand the
-              buyer’s specifications, commercial needs, destination, and
-              timeline before proposing an appropriate path forward.
+              Every enquiry begins with the buyer brief. Product, quantity,
+              specification, intended use, destination, timeline and buyer
+              status must be understood before a suitable next step can be
+              proposed.
             </p>
             <p className="mt-5">
-              Our role is to make cross-border coordination more composed and
-              transparent—without overstating what has not been agreed or
-              verified.
+              Catalogue entries are indicative sourcing categories. They do not
+              by themselves confirm stock, supplier appointment, certification,
+              pricing, export eligibility or the completion of any transaction.
+            </p>
+            <p className="mt-5">
+              Claims relating to origin, quality, composition, sustainability,
+              regulatory status or performance are repeated only after relevant
+              evidence is obtained from the selected supply parties.
             </p>
           </div>
         </Section>
