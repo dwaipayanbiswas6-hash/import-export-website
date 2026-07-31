@@ -1,5 +1,5 @@
 import { existsSync, rmSync } from 'node:fs';
-import catalogue from '../.catalogue-check/products-with-healthcare-image-overrides.js';
+import catalogue from '../.catalogue-check/products-with-home-lifestyle-image-overrides.js';
 
 const result = catalogue.validateCatalogue();
 const missingImages = catalogue.products
