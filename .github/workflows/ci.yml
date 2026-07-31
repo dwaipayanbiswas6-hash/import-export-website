@@ -21,5 +21,7 @@ jobs:
         run: npm run typecheck
       - name: Lint
         run: npm run lint
+      - name: Validate catalogue
+        run: npm run catalogue:validate
       - name: Build
         run: npm run build
