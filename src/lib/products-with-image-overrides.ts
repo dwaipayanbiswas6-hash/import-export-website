@@ -112,6 +112,26 @@ const imageOverrides: Record<
     imageAlt:
       'Assorted flexible stand-up pouches and sealed packs in metallic, kraft and clear formats',
   },
+  'electrical-cables': {
+    image: '/images/products/electrical-cables.webp',
+    imageAlt:
+      'Assorted insulated electrical power cables with exposed copper conductors and protective layers',
+  },
+  'led-components': {
+    image: '/images/products/led-components.webp',
+    imageAlt:
+      'Assorted LED diodes, COB modules, surface-mount LEDs and strip-light components',
+  },
+  'solar-components': {
+    image: '/images/products/solar-components.webp',
+    imageAlt:
+      'Solar panels, inverter, charge controller, mounting rails and electrical cables',
+  },
+  batteries: {
+    image: '/images/products/batteries.webp',
+    imageAlt:
+      'Assorted industrial lead-acid and lithium batteries in multiple sizes',
+  },
 };
 
 export const products: Product[] = baseProducts.map((product) => {
