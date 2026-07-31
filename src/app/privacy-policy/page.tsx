@@ -33,8 +33,8 @@ export default function Page() {
             is sent to the business email entered for the enquiry. Authentication
             records, session information and the verified email may be processed
             to control access. A signed-in buyer is permitted to view only
-            enquiries linked to that verified business email under the portal's
-            access-control rules.
+            enquiries linked to that verified business email under the access
+            controls applied to the portal.
           </p>
 
           <h2>Portal records and conversations</h2>
