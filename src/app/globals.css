@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 
 :root {
+  color-scheme: light;
   --background: #ffffff;
   --foreground: #18140e;
   --card: #ffffff;
@@ -11,30 +12,26 @@
   --gold-soft: #e5d1a5;
   --line: #e9e1d3;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #17140f;
-    --foreground: #f8f3e8;
-    --card: #211d16;
-    --cream: #1c1812;
-    --muted: #c9c0b1;
-    --gold: #d0a34f;
-    --gold-dark: #e2bd72;
-    --gold-soft: #70562a;
-    --line: #3e3528;
-  }
-}
 * {
   box-sizing: border-box;
 }
 html {
+  min-width: 320px;
   scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 body {
+  min-width: 320px;
   margin: 0;
+  overflow-x: clip;
   background: var(--background);
   color: var(--foreground);
   font-family: Inter, Avenir, 'Helvetica Neue', Arial, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+img,
+svg {
+  max-width: 100%;
 }
 h1,
 h2,
@@ -43,15 +40,45 @@ h3,
   font-family: 'Playfair Display', Didot, 'Bodoni MT', Georgia, serif;
 }
 a,
-button {
+button,
+input,
+select,
+textarea {
   outline-color: var(--gold);
+}
+button,
+select {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
 }
 ::selection {
   background: var(--gold);
   color: white;
 }
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  transform: translateY(-180%);
+  border-radius: 999px;
+  background: var(--foreground);
+  padding: 0.75rem 1rem;
+  color: var(--background);
+  font-weight: 700;
+  transition: transform 0.2s;
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
 .glass {
-  background: color-mix(in srgb, var(--card) 91%, transparent);
+  background: color-mix(in srgb, var(--card) 94%, transparent);
   backdrop-filter: blur(18px);
 }
 .eyebrow {
@@ -67,7 +94,8 @@ button {
   font-weight: 600;
   transition: color 0.2s;
 }
-.nav-link:hover {
+.nav-link:hover,
+.nav-link[aria-current='page'] {
   color: var(--gold-dark);
 }
 .button-primary,
@@ -80,8 +108,10 @@ button {
   gap: 0.55rem;
   border-radius: 999px;
   padding: 0.8rem 1.5rem;
+  text-align: center;
   font-size: 0.9rem;
   font-weight: 700;
+  line-height: 1.25;
   transition:
     transform 0.25s,
     box-shadow 0.25s,
@@ -100,12 +130,6 @@ button {
 .button-gold {
   background: var(--gold);
   color: white;
-}
-.button-primary:hover,
-.button-secondary:hover,
-.button-gold:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(177, 132, 54, 0.25);
 }
 .hero {
   background: linear-gradient(120deg, var(--background) 45%, var(--cream));
@@ -139,7 +163,7 @@ button {
   border: 1px solid rgba(177, 132, 54, 0.22);
   border-radius: 2.55rem;
   padding: 2.5rem;
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.72);
 }
 .premium-card {
   border: 1px solid var(--line);
@@ -152,11 +176,6 @@ button {
     border-color 0.3s,
     box-shadow 0.3s;
 }
-.premium-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--gold-soft);
-  box-shadow: 0 26px 70px rgba(53, 39, 17, 0.1);
-}
 .gold-link {
   display: inline-flex;
   align-items: center;
@@ -164,6 +183,13 @@ button {
   color: var(--gold-dark);
   font-size: 0.875rem;
   font-weight: 700;
+}
+.contact-link {
+  overflow-wrap: anywhere;
+  color: var(--gold-dark);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 .section-tint {
   background: var(--cream);
@@ -207,6 +233,47 @@ button {
 }
 .prose-card p {
   margin-top: 0.8rem;
+}
+@media (hover: hover) {
+  .button-primary:hover,
+  .button-secondary:hover,
+  .button-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px rgba(177, 132, 54, 0.25);
+  }
+  .premium-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--gold-soft);
+    box-shadow: 0 26px 70px rgba(53, 39, 17, 0.1);
+  }
+}
+@media (max-width: 767px) {
+  .eyebrow {
+    letter-spacing: 0.22em;
+  }
+  .hero-orb {
+    right: -12rem;
+    top: -12rem;
+    width: 26rem;
+    height: 26rem;
+  }
+  .hero-panel {
+    border-radius: 2rem;
+  }
+  .hero-panel-inner {
+    min-height: 0;
+    border-radius: 1.6rem;
+    padding: 1.5rem;
+  }
+  .premium-card {
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+  }
+  .trade-banner,
+  .contact-cta {
+    border-radius: 2rem;
+    padding: 2rem;
+  }
 }
 @media (min-width: 768px) {
   .trade-banner,
