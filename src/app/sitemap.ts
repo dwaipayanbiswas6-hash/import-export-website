@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { getAllProductSlugs } from '@/lib/products';
+import { siteUrl } from '@/lib/site';
 
 const routes = [
   '',
@@ -14,15 +15,12 @@ const routes = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://biswasexports.com';
-
   return [
     ...routes,
     ...getAllProductSlugs().map((slug) => `/products/${slug}`),
   ].map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: new Date(),
+    url: `${siteUrl}${route}`,
     changeFrequency: route === '' ? 'weekly' : 'monthly',
-    priority: route === '' ? 1 : 0.7,
+    priority: route === '' ? 1 : route.startsWith('/products/') ? 0.6 : 0.7,
   }));
 }
