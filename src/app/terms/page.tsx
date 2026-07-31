@@ -10,18 +10,34 @@ export default function Page() {
       <PageHero
         eyebrow="Legal"
         title="Terms & Conditions"
-        intro="General terms governing access to and use of the Biswas Exports website."
+        intro="General terms governing access to and use of the Biswas Exports website and Buyer Portal."
       />
       <section className="mx-auto max-w-4xl px-5 py-16 sm:px-6 sm:py-20 lg:px-8">
         <div className="premium-card prose-card leading-8 text-[color:var(--muted)]">
-          <p className="text-sm">Last updated: 31 July 2026</p>
+          <p className="text-sm">Last updated: 1 August 2026</p>
 
           <h2>Website operator and purpose</h2>
           <p>
             References to “Biswas Exports”, “we”, “us” or “our” mean the
             operator of this website under the public-facing Biswas Exports
-            name. The website is intended for general business information and
-            professional B2B sourcing enquiries.
+            name. The website is intended for general business information,
+            professional B2B sourcing enquiries and secure enquiry communication.
+          </p>
+
+          <h2>Buyer Portal access</h2>
+          <p>
+            Portal access is linked to the verified business email used for an
+            enquiry. A one-time email link may be used instead of a password. You
+            must not forward a sign-in link, attempt to access another buyer's
+            records, impersonate another person or company, or bypass access
+            controls. You are responsible for protecting access to your business
+            email account and for signing out on shared devices.
+          </p>
+          <p>
+            Portal status labels, messages and uploaded documents are business
+            communications, but they do not by themselves create a binding
+            quotation, order, contract or guarantee. Binding terms must be
+            expressly confirmed in the applicable written commercial agreement.
           </p>
 
           <h2>Indicative catalogue</h2>
@@ -40,11 +56,12 @@ export default function Page() {
 
           <h2>No binding offer</h2>
           <p>
-            Website content, enquiry responses and preliminary discussions do
-            not constitute a binding offer, quotation, purchase contract,
-            agency appointment, warranty or guarantee. A transaction proceeds
-            only under separately agreed written commercial terms between the
-            relevant parties.
+            Website content, portal messages, enquiry responses and preliminary
+            discussions do not constitute a binding offer, quotation, purchase
+            contract, agency appointment, warranty or guarantee unless the
+            relevant communication expressly states otherwise and is issued by
+            an authorised person. A transaction proceeds only under separately
+            agreed written commercial terms between the relevant parties.
           </p>
 
           <h2>Buyer and supplier verification</h2>
@@ -62,25 +79,36 @@ export default function Page() {
             goods, batteries, cosmetics, toys and other regulated categories are
             considered only for lawful B2B enquiries. Required licences,
             registrations, classifications, safety information, transport rules
-            and destination approvals must be confirmed for the specific
-            product and transaction. No medical, therapeutic or professional
-            advice is provided through this website.
+            and destination approvals must be confirmed for the specific product
+            and transaction. No medical, therapeutic or professional advice is
+            provided through this website or portal.
+          </p>
+
+          <h2>Files and messages</h2>
+          <p>
+            You may upload only lawful business documents necessary for the
+            enquiry. Do not upload malware, executable files, unrelated personal
+            data, confidential information you are not authorised to disclose or
+            material that infringes third-party rights. We may reject, quarantine
+            or remove unsafe or irrelevant files.
           </p>
 
           <h2>Third-party services</h2>
           <p>
-            Suppliers, laboratories, inspection bodies, logistics providers,
-            payment providers and other third parties act under their own terms
-            and responsibilities. Reference to a third party does not guarantee
-            its performance, approval or continued availability.
+            Website hosting, authentication, database, email, storage, suppliers,
+            laboratories, inspection bodies, logistics providers, payment
+            providers and other third parties act under their own terms and
+            responsibilities. Reference to a third party does not guarantee its
+            performance, approval or continued availability.
           </p>
 
           <h2>Permitted use</h2>
           <p>
-            You may use this website for lawful business enquiries. You must not
-            submit false or unlawful information, upload harmful files, attempt
-            unauthorised access, interfere with the website, scrape it in a way
-            that disrupts service, or misuse its content or branding.
+            You may use this website and portal for lawful business enquiries.
+            You must not submit false or unlawful information, upload harmful
+            files, attempt unauthorised access, interfere with the service,
+            overwhelm login or enquiry endpoints, scrape it in a way that
+            disrupts service, or misuse its content or branding.
           </p>
 
           <h2>Intellectual property</h2>
@@ -93,10 +121,11 @@ export default function Page() {
 
           <h2>Availability and limitation</h2>
           <p>
-            We may change, suspend or remove website content without notice. To
-            the extent permitted by applicable law, we are not responsible for
-            decisions made solely from general website content or for losses
-            caused by third-party services, unauthorised use or circumstances
+            We may change, suspend or remove website or portal functionality
+            without notice where reasonably necessary. To the extent permitted by
+            applicable law, we are not responsible for decisions made solely from
+            general website content or for losses caused by third-party services,
+            unauthorised access, email-account compromise or circumstances
             outside reasonable control.
           </p>
 
@@ -105,6 +134,10 @@ export default function Page() {
             Questions about these terms may be submitted through the{' '}
             <Link className="contact-link" href="/contact">
               Contact page
+            </Link>
+            . Existing buyers may use the{' '}
+            <Link className="contact-link" href="/portal/login">
+              Buyer Portal
             </Link>
             .
           </p>
