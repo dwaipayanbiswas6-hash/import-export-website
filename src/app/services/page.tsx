@@ -1,18 +1,21 @@
 import type { Metadata } from 'next';
 import { PageHero, PremiumCard, Section } from '@/components/ui';
 import { services, workflow } from '@/lib/data';
+
 export const metadata: Metadata = { title: 'Services' };
+
 export default function Page() {
   return (
     <>
       <PageHero
-        eyebrow="Export services"
-        title="Coordinated support for confident cross-border buying."
-        intro="Our services are designed to bring structure and visibility to sourcing suitable products from India and preparing them for export."
+        eyebrow="Export sourcing support"
+        title="Structured coordination for professional cross-border enquiries."
+        intro="The scope shown here describes the activities Biswas Exports may coordinate. The exact role, responsibility, fee and deliverable are confirmed separately for each accepted engagement."
       />
       <Section
-        eyebrow="Capabilities"
-        title="Support shaped around the transaction."
+        eyebrow="Coordination scope"
+        title="Support shaped around the buyer brief and transaction."
+        intro="No catalogue listing or website description guarantees supplier availability, product conformity, regulatory approval, shipment or commercial acceptance."
       >
         <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
@@ -29,7 +32,8 @@ export default function Page() {
       <div className="section-tint">
         <Section
           eyebrow="Workflow"
-          title="Measured progress, clearly communicated."
+          title="Measured progress, clearly documented."
+          intro="Each stage depends on the buyer’s information, suitable supply options, documentary verification and written agreement between the relevant parties."
         >
           <div className="mt-12 grid gap-6 md:grid-cols-4">
             {workflow.map((item) => (
