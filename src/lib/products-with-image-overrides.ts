@@ -89,7 +89,28 @@ const imageOverrides: Record<
   },
   'hand-tools': {
     image: '/images/products/hand-tools.webp',
-    imageAlt: 'Assorted hand tools including spanners, sockets, pliers and screwdrivers',
+    imageAlt:
+      'Assorted hand tools including spanners, sockets, pliers and screwdrivers',
+  },
+  'plastic-packaging': {
+    image: '/images/products/plastic-packaging.webp',
+    imageAlt:
+      'Assorted plastic bottles, jerry cans, tubs and food containers in multiple sizes',
+  },
+  'hdpe-bags': {
+    image: '/images/products/hdpe-bags.webp',
+    imageAlt:
+      'White HDPE carrier bags, flat bags, filled sacks and film rolls arranged in a warehouse',
+  },
+  'corrugated-boxes': {
+    image: '/images/products/corrugated-boxes.webp',
+    imageAlt:
+      'Stacked kraft corrugated shipping boxes in assorted sizes inside a warehouse',
+  },
+  'flexible-packaging': {
+    image: '/images/products/flexible-packaging.webp',
+    imageAlt:
+      'Assorted flexible stand-up pouches and sealed packs in metallic, kraft and clear formats',
   },
 };
 
