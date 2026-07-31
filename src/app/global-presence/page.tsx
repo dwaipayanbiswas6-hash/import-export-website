@@ -1,35 +1,39 @@
 import type { Metadata } from 'next';
 import { Globe2, MapPin, MessagesSquare } from 'lucide-react';
 import { PageHero, PremiumCard, Section } from '@/components/ui';
+
 export const metadata: Metadata = { title: 'Global Presence' };
+
 const principles = [
   {
-    title: 'Rooted in India',
+    title: 'Based in India',
     icon: MapPin,
-    text: 'Our base in Asansol, West Bengal, places us within India’s diverse commercial and manufacturing landscape.',
+    text: 'Biswas Exports operates from Asansol, West Bengal, India.',
   },
   {
-    title: 'Open to global enquiries',
+    title: 'International enquiries welcome',
     icon: Globe2,
-    text: 'We welcome product-led conversations with importers, distributors, retailers, and businesses in international markets.',
+    text: 'Professional enquiries may be submitted by importers, distributors, retailers, manufacturers and other business buyers in international markets.',
   },
   {
-    title: 'Communication without distance',
+    title: 'Documented remote coordination',
     icon: MessagesSquare,
-    text: 'Clear digital communication and documented requirements help every party stay aligned across borders.',
+    text: 'Digital communication, written specifications and documented responsibilities support cross-border enquiry handling.',
   },
 ];
+
 export default function Page() {
   return (
     <>
       <PageHero
-        eyebrow="Global presence"
-        title="An Indian export partner with a worldwide outlook."
-        intro="Global presence is more than a list of pins on a map. For Biswas Exports, it means being prepared to understand international buyer needs and coordinate responsibly from India."
+        eyebrow="International enquiries"
+        title="India-based coordination for buyers in international markets."
+        intro="Biswas Exports receives and reviews professional B2B sourcing enquiries from outside India. Market suitability, supplier availability and transaction feasibility are assessed individually."
       />
       <Section
-        eyebrow="Our perspective"
-        title="Local grounding. Global readiness."
+        eyebrow="Our operating position"
+        title="Local base. International enquiry scope."
+        intro="This page does not claim physical offices, employees, agents, warehouses or distribution networks outside India. Any external representative or service provider must be confirmed in writing for the relevant engagement."
       >
         <div className="mt-12 grid gap-5 md:grid-cols-3">
           {principles.map((item) => (
