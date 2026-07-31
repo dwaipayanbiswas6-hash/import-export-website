@@ -1,11 +1,14 @@
 import { z } from 'zod';
 
 export const productCategories = [
-  'Agricultural Products',
-  'Textiles & Apparel',
-  'Handicrafts & Home Décor',
-  'Industrial Goods',
-  'Consumer Products',
+  'Food & Agriculture',
+  'Processed Vegetarian Food',
+  'Textiles & Fashion',
+  'Engineering & Industrial',
+  'Packaging',
+  'Electrical & Energy',
+  'Chemicals & Healthcare',
+  'Home & Lifestyle',
   'Custom Sourcing',
   'Other',
 ] as const;
