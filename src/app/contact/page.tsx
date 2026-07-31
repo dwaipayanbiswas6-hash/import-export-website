@@ -23,8 +23,15 @@ import {
   productCategories,
   type ContactFormData,
 } from '@/lib/contact';
+import { publicContact, whatsappUrl } from '@/lib/site';
 
 type SubmissionState = 'idle' | 'submitting' | 'success' | 'error';
+type ContactApiResponse = {
+  success?: boolean;
+  enquiryId?: string;
+  error?: string;
+};
+
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ACCEPTED_FILE_TYPES = [
   'application/pdf',
@@ -36,10 +43,6 @@ const ACCEPTED_FILE_TYPES = [
 const inputClass =
   'w-full rounded-2xl border border-[color:var(--line)] bg-[color:var(--card)] px-4 py-3.5 font-normal shadow-sm outline-none transition duration-200 hover:border-[color:var(--gold-soft)] focus:border-[color:var(--gold)] focus:ring-2 focus:ring-[color:var(--gold-soft)]';
 const labelClass = 'grid gap-2 text-sm font-semibold';
-
-function configured(value: string | undefined) {
-  return value?.trim() || null;
-}
 
 export default function Contact() {
   return (
@@ -54,16 +57,16 @@ function ContactContent() {
   const selectedProduct = getProductBySlug(searchParams.get('product') ?? '');
   const [submissionState, setSubmissionState] =
     useState<SubmissionState>('idle');
+  const [enquiryId, setEnquiryId] = useState<string | null>(null);
   const [rfqFile, setRfqFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState('');
   const statusRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const contactEmail = configured(process.env.NEXT_PUBLIC_CONTACT_EMAIL);
-  const contactPhone = configured(process.env.NEXT_PUBLIC_CONTACT_PHONE);
-  const whatsapp = configured(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER);
-  const whatsappHref = whatsapp
-    ? `https://wa.me/${whatsapp.replace(/\D/g, '')}`
-    : null;
+  const whatsappHref = whatsappUrl(publicContact.whatsapp);
+  const directContactAvailable = Boolean(
+    publicContact.email || publicContact.phone || whatsappHref,
+  );
+
   const {
     register,
     handleSubmit,
@@ -79,7 +82,7 @@ function ContactContent() {
         ? contactCategory(selectedProduct.category)
         : undefined,
       productRequirement: selectedProduct
-        ? `I would like to request a quotation for ${selectedProduct.name}. Please share available specifications, packaging options, MOQ, lead time, documentation, and commercial terms.`
+        ? `I would like to submit a sourcing enquiry for ${selectedProduct.name}. Please confirm whether a suitable Indian supply option can be identified and share the specifications, packaging, indicative MOQ, documentation, lead time and commercial information that can be verified.`
         : '',
     },
   });
@@ -119,18 +122,25 @@ function ContactContent() {
       return;
     }
     if (fileError) return;
+
     setSubmissionState('submitting');
+    setEnquiryId(null);
     const payload = new FormData();
     Object.entries(validation.data).forEach(([key, value]) =>
       payload.append(key, String(value ?? '')),
     );
     if (rfqFile) payload.append('rfqFile', rfqFile);
+
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
         body: payload,
       });
-      if (!response.ok) throw new Error('Submission failed');
+      const result = (await response
+        .json()
+        .catch(() => null)) as ContactApiResponse | null;
+      if (!response.ok || !result?.success) throw new Error('Submission failed');
+      setEnquiryId(result.enquiryId ?? null);
       setSubmissionState('success');
     } catch {
       setSubmissionState('error');
@@ -139,6 +149,7 @@ function ContactContent() {
 
   function submitAnother() {
     reset();
+    setEnquiryId(null);
     setRfqFile(null);
     setFileError('');
     if (fileRef.current) fileRef.current.value = '';
@@ -160,44 +171,47 @@ function ContactContent() {
   return (
     <>
       <PageHero
-        eyebrow="CONTACT"
-        title="Tell us what you need to source from India."
-        intro="Share your sourcing requirement, product specifications, quantity, destination and timeline. Biswas Exports will review your enquiry and respond with the next steps."
+        eyebrow="Contact"
+        title="Submit a professional B2B sourcing enquiry."
+        intro="Share the buyer, product, specification, quantity, destination and timeline. Biswas Exports will review the information submitted; any response depends on the completeness of the brief and the verification required."
       />
-      <section className="mx-auto grid max-w-7xl gap-12 px-6 py-20 lg:grid-cols-[.7fr_1.3fr] lg:px-8 lg:py-24">
+      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-[.7fr_1.3fr] lg:gap-12 lg:px-8 lg:py-24">
         <aside className="self-start lg:sticky lg:top-28">
           <p className="eyebrow">Business enquiries</p>
           <h2 className="text-3xl font-semibold">
             Connect with Biswas Exports
           </h2>
           <p className="mt-5 leading-7 text-[color:var(--muted)]">
-            Professional sourcing assistance from India for serious
-            international buying requirements.
+            India-focused sourcing enquiry coordination for professional
+            international buyers. A catalogue listing does not confirm stock,
+            price, supplier appointment or acceptance of an order.
           </p>
-          <div className="mt-9 grid gap-5 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--cream)] p-6 shadow-sm">
+          <div className="mt-9 grid gap-5 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--cream)] p-6 shadow-sm sm:rounded-[2rem]">
             <ContactItem icon={MapPin} title="Location">
               <span>Asansol, West Bengal, India</span>
             </ContactItem>
-            <ContactItem icon={Mail} title="Email">
-              {contactEmail ? (
-                <a className="contact-link" href={`mailto:${contactEmail}`}>
-                  {contactEmail}
+            {publicContact.email && (
+              <ContactItem icon={Mail} title="Email">
+                <a
+                  className="contact-link"
+                  href={`mailto:${publicContact.email}`}
+                >
+                  {publicContact.email}
                 </a>
-              ) : (
-                <span>Contact details coming soon</span>
-              )}
-            </ContactItem>
-            <ContactItem icon={Phone} title="Phone">
-              {contactPhone ? (
-                <a className="contact-link" href={`tel:${contactPhone}`}>
-                  {contactPhone}
+              </ContactItem>
+            )}
+            {publicContact.phone && (
+              <ContactItem icon={Phone} title="Phone">
+                <a
+                  className="contact-link"
+                  href={`tel:${publicContact.phone.replace(/\s/g, '')}`}
+                >
+                  {publicContact.phone}
                 </a>
-              ) : (
-                <span>Contact details coming soon</span>
-              )}
-            </ContactItem>
-            <ContactItem icon={MessageCircle} title="WhatsApp">
-              {whatsappHref ? (
+              </ContactItem>
+            )}
+            {whatsappHref && (
+              <ContactItem icon={MessageCircle} title="WhatsApp">
                 <a
                   className="contact-link"
                   href={whatsappHref}
@@ -206,15 +220,18 @@ function ContactContent() {
                 >
                   Message on WhatsApp
                 </a>
-              ) : (
-                <span>Contact details coming soon</span>
-              )}
-            </ContactItem>
-            <ContactItem icon={Clock3} title="Typical response">
-              <span>Within one business day.</span>
+              </ContactItem>
+            )}
+            {!directContactAvailable && (
+              <ContactItem icon={Mail} title="Preferred contact">
+                <span>Use the secure business enquiry form on this page.</span>
+              </ContactItem>
+            )}
+            <ContactItem icon={Clock3} title="Response timing">
+              <span>{publicContact.responseTime}</span>
             </ContactItem>
             <ContactItem icon={BriefcaseBusiness} title="Enquiry policy">
-              <span>Business enquiries only.</span>
+              <span>Professional business enquiries only.</span>
             </ContactItem>
           </div>
         </aside>
@@ -226,20 +243,31 @@ function ContactContent() {
             className="premium-card self-start outline-none"
             tabIndex={-1}
           >
-            <p className="eyebrow">Enquiry Submitted Successfully</p>
+            <p className="eyebrow">Enquiry received</p>
             <h2 className="text-3xl font-semibold">
               Thank you for contacting Biswas Exports.
             </h2>
             <p className="mt-5 leading-7 text-[color:var(--muted)]">
-              Our export team will review your enquiry and respond after
-              verifying the business details provided.
+              The information you submitted has been accepted for review. You
+              should also receive an acknowledgement at the business email
+              provided.
             </p>
+            {enquiryId && (
+              <div className="mt-7 rounded-2xl border border-[color:var(--line)] bg-[color:var(--cream)] p-5">
+                <b>Enquiry reference</b>
+                <p className="mt-1 break-all font-mono text-sm text-[color:var(--muted)]">
+                  {enquiryId}
+                </p>
+              </div>
+            )}
             <div className="mt-7 border-l-2 border-[color:var(--gold)] pl-4">
-              <b>Typical response time:</b>
-              <p className="text-[color:var(--muted)]">One business day.</p>
+              <b>Response timing</b>
+              <p className="text-[color:var(--muted)]">
+                {publicContact.responseTime}
+              </p>
             </div>
             <button
-              className="button-primary mt-8"
+              className="button-primary mt-8 w-full sm:w-auto"
               type="button"
               onClick={submitAnother}
             >
@@ -250,14 +278,14 @@ function ContactContent() {
           <form
             noValidate
             onSubmit={handleSubmit(onSubmit)}
-            className="grid gap-8 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--card)] p-7 shadow-xl md:p-10"
+            className="grid gap-8 rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--card)] p-5 shadow-xl sm:rounded-[2rem] sm:p-7 md:p-10"
           >
             <div className="absolute -left-[10000px]" aria-hidden="true">
               <label htmlFor="website">Website</label>
               <input
                 id="website"
                 tabIndex={-1}
-                autoComplete="off"
+                autoComplete="new-password"
                 {...register('website')}
               />
             </div>
@@ -265,7 +293,7 @@ function ContactContent() {
             <FormSection
               number="01"
               title="Company information"
-              intro="Tell us who we will be working with."
+              intro="Tell us who is submitting the business enquiry."
             >
               <label
                 className={`${labelClass} md:col-span-2`}
@@ -275,6 +303,7 @@ function ContactContent() {
                 <input
                   id="companyName"
                   autoComplete="organization"
+                  maxLength={160}
                   className={inputClass}
                   {...ariaError('companyName')}
                   {...register('companyName')}
@@ -286,6 +315,7 @@ function ContactContent() {
                 <input
                   id="contactPerson"
                   autoComplete="name"
+                  maxLength={120}
                   className={inputClass}
                   {...ariaError('contactPerson')}
                   {...register('contactPerson')}
@@ -297,6 +327,7 @@ function ContactContent() {
                 <input
                   id="jobTitle"
                   autoComplete="organization-title"
+                  maxLength={120}
                   className={inputClass}
                   {...ariaError('jobTitle')}
                   {...register('jobTitle')}
@@ -313,6 +344,7 @@ function ContactContent() {
                   type="url"
                   placeholder="https://example.com"
                   autoComplete="url"
+                  maxLength={300}
                   className={inputClass}
                   {...ariaError('companyWebsite')}
                   {...register('companyWebsite')}
@@ -325,6 +357,7 @@ function ContactContent() {
                   id="businessEmail"
                   type="email"
                   autoComplete="email"
+                  maxLength={254}
                   className={inputClass}
                   {...ariaError('businessEmail')}
                   {...register('businessEmail')}
@@ -336,6 +369,7 @@ function ContactContent() {
                 <input
                   id="country"
                   autoComplete="country-name"
+                  maxLength={100}
                   className={inputClass}
                   {...ariaError('country')}
                   {...register('country')}
@@ -348,6 +382,7 @@ function ContactContent() {
                   id="phone"
                   type="tel"
                   autoComplete="tel"
+                  maxLength={40}
                   className={inputClass}
                   {...ariaError('phone')}
                   {...register('phone')}
@@ -365,7 +400,6 @@ function ContactContent() {
                 Product Category *
                 <select
                   id="productCategory"
-                  defaultValue=""
                   className={inputClass}
                   {...ariaError('productCategory')}
                   {...register('productCategory')}
@@ -383,6 +417,7 @@ function ContactContent() {
                 Required Quantity *
                 <input
                   id="quantity"
+                  maxLength={160}
                   className={inputClass}
                   {...ariaError('quantity')}
                   {...register('quantity')}
@@ -396,6 +431,7 @@ function ContactContent() {
                 Product Requirement *
                 <textarea
                   id="productRequirement"
+                  maxLength={5000}
                   className={`${inputClass} min-h-32 resize-y`}
                   {...ariaError('productRequirement')}
                   {...register('productRequirement')}
@@ -412,14 +448,18 @@ function ContactContent() {
                 </span>
                 <textarea
                   id="productSpecifications"
+                  maxLength={5000}
                   className={`${inputClass} min-h-28 resize-y`}
+                  {...ariaError('productSpecifications')}
                   {...register('productSpecifications')}
                 />
+                {fieldError('productSpecifications')}
               </label>
               <label className={labelClass} htmlFor="destination">
                 Destination Country / Port *
                 <input
                   id="destination"
+                  maxLength={160}
                   className={inputClass}
                   {...ariaError('destination')}
                   {...register('destination')}
@@ -431,6 +471,7 @@ function ContactContent() {
                 <input
                   id="timeline"
                   placeholder="For example, within 3 months"
+                  maxLength={160}
                   className={inputClass}
                   {...ariaError('timeline')}
                   {...register('timeline')}
@@ -464,7 +505,11 @@ function ContactContent() {
                     type="file"
                     accept=".pdf,.docx,.xlsx,.png,.jpg,.jpeg"
                     className="block w-full cursor-pointer text-sm file:mr-4 file:rounded-full file:border-0 file:bg-[color:var(--gold)] file:px-4 file:py-2 file:font-semibold file:text-white"
-                    aria-describedby="rfqFile-help rfqFile-error"
+                    aria-describedby={
+                      fileError
+                        ? 'rfqFile-help rfqFile-error'
+                        : 'rfqFile-help'
+                    }
                     onChange={(event) =>
                       selectFile(event.target.files?.[0] ?? null)
                     }
@@ -492,9 +537,12 @@ function ContactContent() {
                 </span>
                 <textarea
                   id="additionalNotes"
+                  maxLength={5000}
                   className={`${inputClass} min-h-28 resize-y`}
+                  {...ariaError('additionalNotes')}
                   {...register('additionalNotes')}
                 />
+                {fieldError('additionalNotes')}
               </label>
             </FormSection>
 
@@ -512,7 +560,8 @@ function ContactContent() {
                 />
                 <span>
                   I agree that Biswas Exports may use the information provided
-                  to respond to this enquiry.{' '}
+                  to review and respond to this enquiry. Do not upload passwords,
+                  identity documents, payment-card details or medical records.{' '}
                   <Link
                     className="text-[color:var(--gold-dark)] underline"
                     href="/privacy-policy"
@@ -523,6 +572,7 @@ function ContactContent() {
               </label>
               {fieldError('privacyConsent')}
             </div>
+
             {submissionState === 'error' && (
               <div
                 ref={statusRef}
@@ -531,13 +581,17 @@ function ContactContent() {
                 tabIndex={-1}
                 className="rounded-2xl border border-red-200 bg-red-50 p-4 text-red-800 outline-none"
               >
-                We could not send your enquiry right now. Please try again or
-                contact us directly by email or WhatsApp.
+                We could not deliver the enquiry right now. Please try again
+                later
+                {directContactAvailable
+                  ? ' or use one of the direct contact channels shown on this page.'
+                  : '.'}
               </div>
             )}
+
             <button
               disabled={submissionState === 'submitting'}
-              className="button-primary justify-self-start px-8 transition duration-300 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-60"
+              className="button-primary w-full px-8 transition duration-300 hover:-translate-y-1 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:justify-self-start"
               type="submit"
             >
               {submissionState === 'submitting'
@@ -554,17 +608,7 @@ function ContactContent() {
 function contactCategory(
   category: CatalogueCategory,
 ): ContactFormData['productCategory'] {
-  if (category === 'Food & Agriculture') return 'Agricultural Products';
-  if (category === 'Textiles & Fashion') return 'Textiles & Apparel';
-  if (
-    category === 'Engineering & Industrial' ||
-    category === 'Electrical & Energy'
-  )
-    return 'Industrial Goods';
-  if (category === 'Home & Lifestyle') return 'Handicrafts & Home Décor';
-  if (category === 'Processed Vegetarian Food' || category === 'Packaging')
-    return 'Consumer Products';
-  return 'Custom Sourcing';
+  return category;
 }
 
 function ContactItem({
@@ -583,9 +627,11 @@ function ContactItem({
         size={20}
         aria-hidden="true"
       />
-      <div>
+      <div className="min-w-0">
         <b className="text-sm">{title}</b>
-        <p className="mt-0.5 text-sm text-[color:var(--muted)]">{children}</p>
+        <p className="mt-0.5 break-words text-sm text-[color:var(--muted)]">
+          {children}
+        </p>
       </div>
     </div>
   );
