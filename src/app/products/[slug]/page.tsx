@@ -11,9 +11,11 @@ import {
 } from '@/lib/products';
 
 type Props = { params: Promise<{ slug: string }> };
+
 export function generateStaticParams() {
   return getAllProductSlugs().map((slug) => ({ slug }));
 }
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const product = getProductBySlug(slug);
@@ -30,6 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
   };
 }
+
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
   const product = getProductBySlug(slug);
@@ -46,8 +49,9 @@ export default async function ProductPage({ params }: Props) {
     countryOfOrigin: { '@type': 'Country', name: 'India' },
     category: product.category,
   };
+
   return (
-    <main>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -55,10 +59,10 @@ export default async function ProductPage({ params }: Props) {
         }}
       />
       <div className="border-b border-[color:var(--line)] bg-[color:var(--cream)]">
-        <div className="mx-auto max-w-7xl px-6 py-5 lg:px-8">
+        <div className="mx-auto max-w-7xl px-5 py-4 sm:px-6 sm:py-5 lg:px-8">
           <nav
             aria-label="Breadcrumb"
-            className="flex flex-wrap items-center gap-2 text-sm text-[color:var(--muted)]"
+            className="flex min-w-0 flex-wrap items-center gap-2 text-sm text-[color:var(--muted)]"
           >
             <Link className="hover:text-[color:var(--gold-dark)]" href="/">
               Home
@@ -71,12 +75,14 @@ export default async function ProductPage({ params }: Props) {
               Products
             </Link>
             <span aria-hidden="true">/</span>
-            <span aria-current="page">{product.name}</span>
+            <span className="min-w-0 break-words" aria-current="page">
+              {product.name}
+            </span>
           </nav>
         </div>
       </div>
-      <section className="mx-auto grid max-w-7xl gap-12 px-6 py-16 lg:grid-cols-2 lg:px-8 lg:py-24">
-        <div className="relative aspect-[4/3] overflow-hidden rounded-[2.5rem] border border-[color:var(--line)] bg-[color:var(--cream)] shadow-xl">
+      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-12 sm:px-6 sm:py-16 lg:grid-cols-2 lg:gap-12 lg:px-8 lg:py-24">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--cream)] shadow-xl sm:rounded-[2.5rem]">
           <Image
             src={product.image}
             alt={product.imageAlt}
@@ -88,13 +94,13 @@ export default async function ProductPage({ params }: Props) {
         </div>
         <div className="self-center">
           <p className="eyebrow">{product.category}</p>
-          <h1 className="text-5xl font-semibold leading-tight md:text-6xl">
+          <h1 className="break-words text-4xl font-semibold leading-tight sm:text-5xl md:text-6xl">
             {product.name}
           </h1>
-          <p className="mt-6 text-xl leading-8 text-[color:var(--muted)]">
+          <p className="mt-5 text-lg leading-8 text-[color:var(--muted)] sm:mt-6 sm:text-xl">
             {product.shortDescription}
           </p>
-          <dl className="mt-8 grid gap-4 border-y border-[color:var(--line)] py-6 sm:grid-cols-2">
+          <dl className="mt-7 grid gap-4 border-y border-[color:var(--line)] py-6 sm:mt-8 sm:grid-cols-2">
             <div>
               <dt className="text-sm font-semibold text-[color:var(--muted)]">
                 Origin
@@ -110,27 +116,30 @@ export default async function ProductPage({ params }: Props) {
               </dd>
             </div>
           </dl>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link className="button-primary" href={quoteHref}>
+          <div className="mt-7 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
+            <Link className="button-primary w-full sm:w-auto" href={quoteHref}>
               Request quote <ArrowRight size={18} />
             </Link>
-            <Link className="button-secondary" href="/products">
+            <Link
+              className="button-secondary w-full sm:w-auto"
+              href="/products"
+            >
               <ArrowLeft size={18} /> Back to catalogue
             </Link>
           </div>
         </div>
       </section>
       <section className="section-tint">
-        <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 lg:grid-cols-[1.15fr_.85fr] lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.15fr_.85fr] lg:gap-12 lg:px-8">
           <div>
             <p className="eyebrow">Product overview</p>
-            <h2 className="text-4xl font-semibold">
+            <h2 className="break-words text-3xl font-semibold sm:text-4xl">
               Commercial sourcing information
             </h2>
-            <p className="mt-6 text-lg leading-8 text-[color:var(--muted)]">
+            <p className="mt-5 text-base leading-7 text-[color:var(--muted)] sm:mt-6 sm:text-lg sm:leading-8">
               {product.description}
             </p>
-            <h3 className="mt-10 text-2xl font-semibold">
+            <h3 className="mt-9 text-2xl font-semibold sm:mt-10">
               Typical applications
             </h3>
             <ul className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -145,7 +154,7 @@ export default async function ProductPage({ params }: Props) {
               ))}
             </ul>
           </div>
-          <div className="rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--card)] p-7 shadow-lg">
+          <div className="rounded-[1.5rem] border border-[color:var(--line)] bg-[color:var(--card)] p-6 shadow-lg sm:rounded-[2rem] sm:p-7">
             <PackageCheck className="text-[color:var(--gold)]" />
             <h2 className="mt-5 text-3xl font-semibold">Packaging options</h2>
             <ul className="mt-5 grid gap-3 text-[color:var(--muted)]">
@@ -165,28 +174,32 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </div>
       </section>
-      <section className="mx-auto grid max-w-7xl gap-10 px-6 py-20 lg:grid-cols-2 lg:px-8">
+      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:px-8">
         <div>
           <p className="eyebrow">Specification framework</p>
-          <h2 className="text-4xl font-semibold">
+          <h2 className="break-words text-3xl font-semibold sm:text-4xl">
             Details confirmed before quotation
           </h2>
-          <dl className="mt-8 overflow-hidden rounded-[2rem] border border-[color:var(--line)]">
+          <dl className="mt-7 overflow-hidden rounded-[1.5rem] border border-[color:var(--line)] sm:mt-8 sm:rounded-[2rem]">
             {product.specifications.map((spec) => (
               <div
                 className="grid gap-1 border-b border-[color:var(--line)] p-5 last:border-0 sm:grid-cols-[.8fr_1.2fr]"
                 key={spec.label}
               >
                 <dt className="font-semibold">{spec.label}</dt>
-                <dd className="text-[color:var(--muted)]">{spec.value}</dd>
+                <dd className="break-words text-[color:var(--muted)]">
+                  {spec.value}
+                </dd>
               </div>
             ))}
           </dl>
         </div>
         <div>
           <p className="eyebrow">Buyer notes</p>
-          <h2 className="text-4xl font-semibold">Documentation and review</h2>
-          <div className="mt-8 rounded-[2rem] border-l-4 border-[color:var(--gold)] bg-[color:var(--cream)] p-7">
+          <h2 className="break-words text-3xl font-semibold sm:text-4xl">
+            Documentation and review
+          </h2>
+          <div className="mt-7 rounded-[1.5rem] border-l-4 border-[color:var(--gold)] bg-[color:var(--cream)] p-6 sm:mt-8 sm:rounded-[2rem] sm:p-7">
             <ul className="grid gap-4 leading-7 text-[color:var(--muted)]">
               {product.buyerNotes?.map((note) => (
                 <li key={note}>{note}</li>
@@ -201,12 +214,12 @@ export default async function ProductPage({ params }: Props) {
       </section>
       {related.length > 0 && (
         <section className="border-t border-[color:var(--line)]">
-          <div className="mx-auto max-w-7xl px-6 py-20 lg:px-8">
+          <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 sm:py-20 lg:px-8">
             <p className="eyebrow">Related products</p>
-            <h2 className="text-4xl font-semibold">
+            <h2 className="break-words text-3xl font-semibold sm:text-4xl">
               More from {product.category}
             </h2>
-            <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-8 grid gap-6 md:grid-cols-2 xl:mt-10 xl:grid-cols-3">
               {related.map((item) => (
                 <ProductCard product={item} key={item.id} />
               ))}
@@ -214,6 +227,6 @@ export default async function ProductPage({ params }: Props) {
           </div>
         </section>
       )}
-    </main>
+    </>
   );
 }
