@@ -1,5 +1,6 @@
+import 'server-only';
 import { createClient } from '@supabase/supabase-js';
-import { getSupabaseServiceConfig } from './config';
+import { getSupabaseServiceConfig } from './service-config';
 
 export function createAdminSupabaseClient() {
   const config = getSupabaseServiceConfig();
