@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { isPortalAdmin, normaliseEmail } from '@/lib/portal';
 import { sendPortalAccessLink } from '@/lib/portal-notifications';
-import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -34,16 +33,19 @@ function limited(ip: string) {
   return false;
 }
 
-function safeNext(value: string | undefined, admin: boolean) {
-  if (admin && value?.startsWith('/admin/')) return value;
-  return '/portal';
+function safeNext(value: string | undefined) {
+  if (value?.startsWith('/admin/')) return value;
+  return '/admin/enquiries';
 }
 
 export async function POST(request: Request) {
   const requestUrl = new URL(request.url);
   const origin = request.headers.get('origin');
   if (origin && origin !== requestUrl.origin) {
-    return NextResponse.json({ error: 'Request origin was not accepted.' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'Request origin was not accepted.' },
+      { status: 403 },
+    );
   }
 
   if (limited(clientIp(request))) {
@@ -63,42 +65,19 @@ export async function POST(request: Request) {
   const parsed = loginSchema.safeParse(payload);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: 'Enter a valid business email.' },
+      { error: 'Enter a valid administrator email.' },
       { status: 400 },
     );
   }
 
-  const admin = createAdminSupabaseClient();
-  if (!admin) {
-    return NextResponse.json(
-      { error: 'The buyer portal is not configured yet.' },
-      { status: 503 },
-    );
-  }
-
   const email = normaliseEmail(parsed.data.email);
-  const adminUser = isPortalAdmin(email);
-  const { data, error } = await admin
-    .from('enquiries')
-    .select('id')
-    .eq('buyer_email', email)
-    .limit(1);
-
-  if (error) {
-    console.error('Portal login lookup failed.', error.message);
-    return NextResponse.json(
-      { error: 'The buyer portal is temporarily unavailable.' },
-      { status: 503 },
-    );
-  }
-
-  if (adminUser || (data?.length ?? 0) > 0) {
-    await sendPortalAccessLink(email, safeNext(parsed.data.next, adminUser));
+  if (isPortalAdmin(email)) {
+    await sendPortalAccessLink(email, safeNext(parsed.data.next));
   }
 
   return NextResponse.json({
     success: true,
     message:
-      'If this business email is linked to an enquiry, a secure sign-in link has been sent.',
+      'If this email is authorised for the Biswas Exports admin inbox, a secure sign-in link has been sent.',
   });
 }
