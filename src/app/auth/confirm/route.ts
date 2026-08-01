@@ -4,8 +4,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 function safeNext(value: string | null) {
   if (value?.startsWith('/admin/')) return value;
-  if (value?.startsWith('/portal')) return value;
-  return '/portal';
+  return '/admin/enquiries';
 }
 
 export async function GET(request: NextRequest) {
@@ -28,7 +27,7 @@ export async function GET(request: NextRequest) {
   const errorUrl = new URL('/portal/login', request.url);
   errorUrl.searchParams.set(
     'error',
-    'The sign-in link is invalid or expired. Request a new secure link.',
+    'The administrator sign-in link is invalid or expired. Request a new secure link.',
   );
   return NextResponse.redirect(errorUrl);
 }
