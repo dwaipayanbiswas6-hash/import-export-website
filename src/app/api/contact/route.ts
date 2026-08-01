@@ -7,10 +7,7 @@ import {
   normaliseEmail,
   safeFilename,
 } from '@/lib/portal';
-import {
-  notifyAdminOfEnquiry,
-  sendPortalAccessLink,
-} from '@/lib/portal-notifications';
+import { notifyAdminOfEnquiry } from '@/lib/portal-notifications';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 
 export const runtime = 'nodejs';
@@ -125,11 +122,11 @@ export async function POST(request: Request) {
 
   const admin = createAdminSupabaseClient();
   if (!admin) {
-    console.error('Supabase portal configuration is incomplete.');
+    console.error('Supabase enquiry configuration is incomplete.');
     return json(
       {
         error:
-          'The secure enquiry portal is temporarily unavailable. Please try again later.',
+          'The secure enquiry system is temporarily unavailable. Please try again later.',
       },
       503,
     );
@@ -153,10 +150,7 @@ export async function POST(request: Request) {
 
     if (uploadError) {
       console.error('RFQ storage failed.', uploadError.message);
-      return json(
-        { error: 'We could not store the RFQ attachment.' },
-        502,
-      );
+      return json({ error: 'We could not store the RFQ attachment.' }, 502);
     }
   }
 
@@ -188,36 +182,19 @@ export async function POST(request: Request) {
     if (attachmentPath) {
       await admin.storage.from('enquiry-files').remove([attachmentPath]);
     }
-    return json(
-      { error: 'We could not save the enquiry.' },
-      502,
-    );
+    return json({ error: 'We could not save the enquiry.' }, 502);
   }
 
-  const { error: messageError } = await admin.from('enquiry_messages').insert({
-    enquiry_id: enquiryId,
-    sender_role: 'system',
-    sender_email: null,
-    body: `Enquiry ${reference} was received and added to the Biswas Exports buyer portal.`,
+  const adminNotificationSent = await notifyAdminOfEnquiry({
+    reference,
+    companyName: result.data.companyName,
+    category: result.data.productCategory,
+    buyerEmail,
   });
-  if (messageError) {
-    console.error('Initial portal message failed.', messageError.message);
-  }
-
-  const [portalEmailSent] = await Promise.all([
-    sendPortalAccessLink(buyerEmail),
-    notifyAdminOfEnquiry({
-      reference,
-      companyName: result.data.companyName,
-      category: result.data.productCategory,
-      buyerEmail,
-    }),
-  ]);
 
   return json({
     success: true,
     reference,
-    portalEmailSent,
-    portalUrl: '/portal/login',
+    adminNotificationSent,
   });
 }
