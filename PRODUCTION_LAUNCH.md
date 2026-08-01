@@ -1,48 +1,40 @@
 # Biswas Exports — Phase 2 Production Launch
 
-The enquiry database and Buyer Portal are the primary records. Email is used for passwordless sign-in and optional notifications; an enquiry must not be lost merely because a notification fails.
+The Supabase enquiry database and private administrator inbox are the primary records. Buyers do not receive portal accounts or sign-in links. Biswas Exports responds directly to the business email, phone or WhatsApp details supplied in the enquiry.
 
 ## 1. Confirm public and administrator details
 
 Approve these values before adding them to Vercel:
 
 - Final public domain
-- Public business email, if displayed
+- Public business email, preferably `contact@biswasexports.com` after the mailbox is configured
 - Administrator business email or comma-separated emails
 - Public phone and WhatsApp numbers, if displayed
 - Response-time wording that does not create an unconditional guarantee
 - Optional legal name and registration disclosure supported by records
 
-Do not place API keys, service-role keys or private inbox details in GitHub, screenshots or public environment variables.
+Do not place API keys, secret keys or private inbox details in GitHub, screenshots or public environment variables.
 
-## 2. Create the Supabase project
+## 2. Supabase project and schema
 
-1. Create a Supabase project in the preferred region.
-2. Open **Project Settings → API**.
-3. Copy the project URL and publishable key.
-4. Copy the service-role key separately and treat it as a secret.
-5. Never expose the service-role key with a `NEXT_PUBLIC_` prefix.
-
-## 3. Install the database and private storage schema
-
-Open **Supabase → SQL Editor** and run:
+The Supabase project must contain the migration:
 
 ```text
 supabase/migrations/202608010001_buyer_portal.sql
 ```
 
-The migration creates:
+The existing migration creates the `enquiries` table, supporting records and the private `enquiry-files` storage bucket. The current application uses the enquiry table and private storage through server-side administrator access. Buyer-facing portal routes and messaging are disabled.
 
-- `enquiries`
-- `enquiry_messages`
-- Buyer row-level security policies
-- A function that links enquiries to the verified buyer account
-- A private `enquiry-files` storage bucket
-- Status and activity-update triggers
+Confirm:
 
-After running it, confirm that RLS is enabled on both public tables and that the storage bucket is private.
+- The Supabase project is healthy.
+- The migration completed successfully.
+- The `enquiry-files` bucket is private.
+- The service secret is stored only in Vercel server-side environment variables.
 
-## 4. Configure passwordless business-email authentication
+## 3. Configure administrator authentication
+
+Supabase passwordless authentication is used only by approved administrators.
 
 In **Supabase → Authentication → URL Configuration**:
 
@@ -50,26 +42,30 @@ In **Supabase → Authentication → URL Configuration**:
 2. Add the final callback URL:
 
 ```text
-https://your-domain.com/portal/callback
+https://your-domain.com/portal/callback**
 ```
 
 3. During preview testing, add only the exact Vercel preview callback being tested.
 4. Remove obsolete preview redirects after launch.
 
-Email authentication and Magic Links must be enabled. The default Supabase email sender can be used for limited setup testing. Configure a production SMTP provider before inviting real buyers so delivery, sender identity and limits are suitable for business use.
+The administrator sign-in page is:
 
-The project also includes `/auth/confirm` for a future server-side token-hash email template. The default flow currently returns through `/portal/callback` and creates a cookie-based portal session.
+```text
+/portal/login?next=/admin/enquiries
+```
 
-## 5. Add Vercel environment variables
+It sends a link only when the email is listed in `PORTAL_ADMIN_EMAILS`. This URL is not linked from the public buyer experience.
 
-Required for the database-first portal:
+## 4. Add Vercel environment variables
+
+Required:
 
 ```text
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 NEXT_PUBLIC_ALLOW_INDEXING=false
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
-SUPABASE_SERVICE_ROLE_KEY=your-secret-service-role-key
+SUPABASE_SERVICE_ROLE_KEY=your-server-secret
 PORTAL_ADMIN_EMAILS=your-admin@company.com
 NEXT_PUBLIC_CONTACT_RESPONSE_TIME=Your approved response-time wording
 ```
@@ -77,68 +73,63 @@ NEXT_PUBLIC_CONTACT_RESPONSE_TIME=Your approved response-time wording
 Optional public details:
 
 ```text
-NEXT_PUBLIC_CONTACT_EMAIL=
+NEXT_PUBLIC_CONTACT_EMAIL=contact@biswasexports.com
 NEXT_PUBLIC_CONTACT_PHONE=
 NEXT_PUBLIC_WHATSAPP_NUMBER=
 NEXT_PUBLIC_LEGAL_NAME=
 NEXT_PUBLIC_REGISTRATION_LINE=
 ```
 
-Optional Resend notifications:
+Optional Resend administrator alerts:
 
 ```text
 RESEND_API_KEY=
 CONTACT_TO_EMAIL=
-CONTACT_FROM_EMAIL=Biswas Exports <enquiries@your-verified-domain.com>
-CONTACT_REPLY_TO_EMAIL=
+CONTACT_FROM_EMAIL=Biswas Exports <contact@biswasexports.com>
 ```
 
-Resend is not required to store enquiries or portal messages. Configure all four Resend variables together or leave them blank.
+Resend is not required to save an enquiry. When configured, it sends an alert to the administrator after the database record is created. Buyers are not sent authentication or portal-notification emails.
 
-Use real secrets only in the Vercel Production environment. Preview deployments can use a separate Supabase test project or remain unconfigured.
+## 5. Deploy and validate configuration
 
-## 6. Deploy and validate configuration
-
-After adding the variables, redeploy the project and run:
+After adding the variables, redeploy and run:
 
 ```bash
 npm run launch:check
 ```
 
-The validator checks the domain, Supabase settings, administrator emails and optional Resend group without printing secret values.
+The validator checks the production domain, Supabase settings, administrator emails and optional Resend administrator-alert group without printing secret values.
 
-## 7. Test the complete buyer journey
+## 6. Test the public enquiry flow
 
 1. Submit a valid enquiry without an attachment.
-2. Confirm the success page displays an enquiry reference.
-3. Confirm the row appears in Supabase and `/admin/enquiries`.
-4. Confirm the buyer receives a Magic Link from Supabase Auth.
-5. Open the link and verify `/portal` shows only enquiries for that business email.
-6. Open the enquiry and post a buyer reply.
-7. Sign in with an email that has no enquiry and confirm no data is exposed.
-8. Submit a PDF below 10 MB and confirm the private file can be opened only through a temporary signed link.
-9. Try an unsupported file and a file over 10 MB; both must be rejected.
-10. Confirm repeated enquiry and login requests are rate-limited.
+2. Confirm the success page displays a unique `BE-YYYY-...` reference.
+3. Confirm the page does not mention a buyer portal or ask the buyer to sign in.
+4. Confirm the row appears in Supabase and `/admin/enquiries`.
+5. Submit a PDF below 10 MB and confirm the private file can be opened from the admin workspace through a temporary signed link.
+6. Try an unsupported file and a file over 10 MB; both must be rejected.
+7. Confirm repeated enquiry requests are rate-limited.
 
-## 8. Test the administrator workflow
+## 7. Test the administrator workflow
 
 1. Sign in using an email listed in `PORTAL_ADMIN_EMAILS`.
 2. Open `/admin/enquiries` and confirm all enquiries are visible.
-3. Open one enquiry and change its status.
-4. Post a response and optional document.
-5. Confirm the buyer can read the response after portal login.
-6. Confirm a non-admin authenticated buyer is redirected away from admin routes.
-7. Confirm service-role keys and other secrets never appear in browser source or network responses.
+3. Confirm an unapproved email does not receive an administrator sign-in link.
+4. Open one enquiry and change its status.
+5. Tap **Reply by email** and confirm the device opens an email draft addressed to the buyer with the enquiry reference in the subject.
+6. Send real responses from the official Biswas Exports mailbox, preferably `contact@biswasexports.com` after it is configured.
+7. Confirm private RFQ files are not publicly accessible.
+8. Confirm server secrets never appear in browser source or network responses.
 
-## 9. Test optional email notifications
+## 8. Test optional administrator notifications
 
 When Resend is configured:
 
 1. Confirm the administrator receives a new-enquiry alert.
-2. Confirm the buyer receives a response-available notification after an admin portal reply.
-3. Confirm a Resend failure does not remove or reject the saved enquiry or message.
+2. Confirm the alert contains the enquiry reference, buyer company and business email.
+3. Confirm a Resend failure does not remove or reject the saved enquiry.
 
-## 10. Connect the final domain and security checks
+## 9. Connect the final domain and security checks
 
 1. Add the domain to Vercel and apply the DNS records.
 2. Wait for a valid SSL certificate.
@@ -146,9 +137,9 @@ When Resend is configured:
 4. Confirm security headers are present.
 5. Check mobile, tablet, desktop and keyboard navigation.
 6. Confirm all 87 product images and representative product pages load.
-7. Confirm Privacy Policy and Terms describe portal storage and authentication.
+7. Confirm the Privacy Policy and Terms describe database storage and direct email responses accurately.
 
-## 11. Enable indexing only after portal acceptance
+## 10. Enable indexing only after acceptance
 
 1. Keep `NEXT_PUBLIC_ALLOW_INDEXING=false` throughout setup and testing.
 2. After every production test passes, set it to `true`.
@@ -157,4 +148,4 @@ When Resend is configured:
 
 ## Phase 2 completion rule
 
-Phase 2 is operationally complete only when the final domain works, the Supabase migration is installed, a real enquiry is stored, the buyer can sign in and view the response, the administrator can reply from the private inbox, private files remain protected, and all approved public details are accurate.
+Phase 2 is operationally complete only when the final domain works, a real enquiry is saved, an approved administrator can access the private inbox, status changes work, private RFQ files remain protected, direct email reply drafts open correctly and all approved public details are accurate.
