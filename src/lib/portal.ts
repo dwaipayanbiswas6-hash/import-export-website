@@ -11,7 +11,6 @@ export const enquiryStatuses = [
 ] as const;
 
 export type EnquiryStatus = (typeof enquiryStatuses)[number];
-export type MessageSenderRole = 'buyer' | 'admin' | 'system';
 
 export type PortalEnquiry = {
   id: string;
@@ -37,17 +36,6 @@ export type PortalEnquiry = {
   created_at: string;
   updated_at: string;
   last_activity_at: string;
-};
-
-export type PortalMessage = {
-  id: string;
-  enquiry_id: string;
-  sender_role: MessageSenderRole;
-  sender_email: string | null;
-  body: string;
-  attachment_path: string | null;
-  attachment_name: string | null;
-  created_at: string;
 };
 
 export const portalAttachmentTypes = new Set([
