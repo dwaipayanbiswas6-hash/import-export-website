@@ -189,7 +189,7 @@ export default async function AdminEnquiryPage({ params, searchParams }: Props) 
           <div className="mt-8 rounded-[2rem] border border-[color:var(--line)] bg-white p-6 shadow-sm sm:p-8">
             <h2 className="text-2xl font-semibold">Direct email workflow</h2>
             <p className="mt-4 leading-7 text-[color:var(--muted)]">
-              Buyer portal messaging is disabled. Reply to the buyer's verified
+              Buyer portal messaging is disabled. Reply to the buyer’s verified
               business email, keep the enquiry reference in the subject line and
               update the status here after sending.
             </p>
