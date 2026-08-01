@@ -1,9 +1,21 @@
 'use server';
 
+import { createHash } from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+
+const DUPLICATE_REPLY_WINDOW_MS = 5 * 60 * 1000;
+
+function createReplyId(enquiryId: string, email: string, body: string) {
+  const timeBucket = Math.floor(Date.now() / DUPLICATE_REPLY_WINDOW_MS);
+  const digest = createHash('sha256')
+    .update(`${enquiryId}\u0000${email}\u0000${body}\u0000${timeBucket}`)
+    .digest('hex');
+
+  return `${digest.slice(0, 8)}-${digest.slice(8, 12)}-${digest.slice(12, 16)}-${digest.slice(16, 20)}-${digest.slice(20, 32)}`;
+}
 
 export async function signOut() {
   const supabase = await createServerSupabaseClient();
@@ -33,13 +45,16 @@ export async function replyToEnquiry(formData: FormData) {
     .maybeSingle();
   if (!enquiry) redirect('/portal');
 
+  const senderEmail = user.email.toLowerCase();
+  const messageId = createReplyId(enquiryId, senderEmail, body);
   const { error } = await supabase.from('enquiry_messages').insert({
+    id: messageId,
     enquiry_id: enquiryId,
     sender_role: 'buyer',
-    sender_email: user.email.toLowerCase(),
+    sender_email: senderEmail,
     body,
   });
-  if (error) {
+  if (error && error.code !== '23505') {
     console.error('Buyer portal reply failed.', error.message);
     redirect(`/portal/enquiries/${enquiryId}?error=send`);
   }
