@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  ArrowRight,
   BriefcaseBusiness,
   Clock3,
   Mail,
@@ -37,7 +36,6 @@ const labelClass = 'grid gap-2 text-sm font-semibold';
 
 type Receipt = {
   reference: string;
-  portalEmailSent: boolean;
 };
 
 function configured(value: string | undefined) {
@@ -142,15 +140,11 @@ function ContactContent() {
       const result = (await response.json()) as {
         error?: string;
         reference?: string;
-        portalEmailSent?: boolean;
       };
       if (!response.ok || !result.reference) {
         throw new Error(result.error || 'We could not save the enquiry.');
       }
-      setReceipt({
-        reference: result.reference,
-        portalEmailSent: Boolean(result.portalEmailSent),
-      });
+      setReceipt({ reference: result.reference });
     } catch (error) {
       setSubmissionError(
         error instanceof Error
@@ -188,15 +182,15 @@ function ContactContent() {
       <PageHero
         eyebrow="Contact"
         title="Tell us what you need to source from India."
-        intro="Submit a structured business enquiry. It will be saved in your secure buyer portal, where you can view status updates and responses using the same business email."
+        intro="Submit a structured business enquiry. Our team will review the details and respond directly to the business email you provide."
       />
       <section className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-6 sm:py-20 lg:grid-cols-[.7fr_1.3fr] lg:px-8 lg:py-24">
         <aside className="self-start lg:sticky lg:top-28">
           <p className="eyebrow">Business enquiries</p>
           <h2 className="text-3xl font-semibold">Connect with Biswas Exports</h2>
           <p className="mt-5 leading-7 text-[color:var(--muted)]">
-            Professional India-focused sourcing enquiries are reviewed through a
-            secure, documented portal workflow.
+            Professional India-focused sourcing enquiries are saved in a private
+            admin inbox and reviewed before any commercial response is issued.
           </p>
           <div className="mt-9 grid gap-5 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--cream)] p-6 shadow-sm">
             <ContactItem icon={MapPin} title="Location">
@@ -234,10 +228,11 @@ function ContactContent() {
             <ContactItem icon={BriefcaseBusiness} title="Enquiry policy">
               <span>Professional business enquiries only.</span>
             </ContactItem>
-            <ContactItem icon={ShieldCheck} title="Buyer portal">
-              <Link className="contact-link" href="/portal/login">
-                Sign in to view an existing enquiry
-              </Link>
+            <ContactItem icon={ShieldCheck} title="Secure handling">
+              <span>
+                Enquiries and RFQ files are restricted to the Biswas Exports
+                administration workflow.
+              </span>
             </ContactItem>
           </div>
         </aside>
@@ -251,11 +246,12 @@ function ContactContent() {
           >
             <p className="eyebrow">Enquiry saved successfully</p>
             <h2 className="text-3xl font-semibold sm:text-4xl">
-              Check your business email or open the Buyer Portal.
+              Your business enquiry has been received.
             </h2>
             <p className="mt-5 leading-7 text-[color:var(--muted)]">
-              Your enquiry is safely stored. Use the same business email entered
-              in the form to view our response and continue the conversation.
+              Our team will review the submitted information and reply directly
+              to the business email provided in the form. Keep the reference
+              below for future communication.
             </p>
             <div className="mt-7 rounded-2xl border border-[color:var(--gold-soft)] bg-[color:var(--cream)] p-5">
               <b>Enquiry reference</b>
@@ -263,15 +259,7 @@ function ContactContent() {
                 {receipt.reference}
               </p>
             </div>
-            <p className="mt-5 text-sm leading-6 text-[color:var(--muted)]">
-              {receipt.portalEmailSent
-                ? 'A secure sign-in link was requested for your business email. It may take a few minutes to arrive.'
-                : 'The enquiry is saved, but the email link could not be sent. Open the Buyer Portal and request a new secure sign-in link.'}
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <Link className="button-primary" href="/portal/login">
-                Open Buyer Portal <ArrowRight size={17} />
-              </Link>
+            <div className="mt-8">
               <button
                 className="button-secondary"
                 onClick={submitAnother}
@@ -498,8 +486,8 @@ function ContactContent() {
                 />
                 <span>
                   I agree that Biswas Exports may store and use the information
-                  provided to review this enquiry, operate the Buyer Portal and
-                  respond to me.{' '}
+                  provided to review this enquiry and respond to me by email,
+                  phone or WhatsApp.{' '}
                   <Link
                     className="text-[color:var(--gold-dark)] underline"
                     href="/privacy-policy"
