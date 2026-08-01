@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { ArrowRight, Inbox, LogOut, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { signOut } from '@/app/portal/actions';
+import { signOutAdmin } from './actions';
 import {
   isPortalAdmin,
   statusLabel,
@@ -24,7 +24,7 @@ export default async function AdminEnquiriesPage() {
       <main className="mx-auto min-h-[70vh] max-w-4xl px-5 py-20 sm:px-6 lg:px-8">
         <div className="premium-card">
           <p className="eyebrow">Admin inbox</p>
-          <h1 className="text-4xl font-semibold">Portal setup is pending.</h1>
+          <h1 className="text-4xl font-semibold">Admin setup is pending.</h1>
           <p className="mt-5 leading-7 text-[color:var(--muted)]">
             Add the Supabase and administrator environment variables before
             opening the private inbox.
@@ -38,7 +38,7 @@ export default async function AdminEnquiriesPage() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user?.email) redirect('/portal/login?next=/admin/enquiries');
-  if (!isPortalAdmin(user.email)) redirect('/portal');
+  if (!isPortalAdmin(user.email)) redirect('/');
 
   const admin = createAdminSupabaseClient();
   if (!admin) throw new Error('Supabase service configuration is missing.');
@@ -71,7 +71,7 @@ export default async function AdminEnquiriesPage() {
             Signed in as {user.email}
           </p>
         </div>
-        <form action={signOut}>
+        <form action={signOutAdmin}>
           <button className="button-secondary" type="submit">
             <LogOut size={17} /> Sign out
           </button>
@@ -80,8 +80,8 @@ export default async function AdminEnquiriesPage() {
 
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <Metric label="Total enquiries" value={enquiries.length} />
-        <Metric label="New or buyer-replied" value={newCount} />
-        <Metric label="Active discussions" value={activeCount} />
+        <Metric label="New enquiries" value={newCount} />
+        <Metric label="Active enquiries" value={activeCount} />
       </section>
 
       {enquiries.length ? (
