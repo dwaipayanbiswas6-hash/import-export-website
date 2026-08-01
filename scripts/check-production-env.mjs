@@ -55,30 +55,24 @@ const adminEmails = emailList('PORTAL_ADMIN_EMAILS');
 if (!adminEmails.length)
   failures.push('PORTAL_ADMIN_EMAILS must contain at least one email.');
 
-const optionalEmailNames = [
-  'CONTACT_TO_EMAIL',
-  'CONTACT_REPLY_TO_EMAIL',
-  'NEXT_PUBLIC_CONTACT_EMAIL',
-];
-for (const name of optionalEmailNames) {
-  const value = process.env[name]?.trim();
-  if (!value) continue;
-  if (name === 'CONTACT_TO_EMAIL') emailList(name);
-  else if (!looksLikeEmail(value)) failures.push(`${name} is not valid.`);
-}
+const contactTo = process.env.CONTACT_TO_EMAIL?.trim();
+if (contactTo) emailList('CONTACT_TO_EMAIL');
+
+const publicEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
+if (publicEmail && !looksLikeEmail(publicEmail))
+  failures.push('NEXT_PUBLIC_CONTACT_EMAIL is not valid.');
 
 const resendVariables = [
   'RESEND_API_KEY',
   'CONTACT_TO_EMAIL',
   'CONTACT_FROM_EMAIL',
-  'CONTACT_REPLY_TO_EMAIL',
 ];
 const configuredResend = resendVariables.filter((name) =>
   process.env[name]?.trim(),
 );
 if (configuredResend.length && configuredResend.length !== resendVariables.length) {
   failures.push(
-    'Configure all Resend notification variables together or leave all of them blank.',
+    'Configure all Resend administrator-alert variables together or leave all of them blank.',
   );
 }
 
@@ -93,5 +87,5 @@ if (failures.length) {
 }
 
 console.log('Production launch environment is complete.');
-console.log('Domain, Supabase portal and administrator settings are present.');
-console.log('Resend notifications are optional because portal records are primary.');
+console.log('Domain, Supabase enquiry database and administrator settings are present.');
+console.log('Resend administrator alerts are optional because database records are primary.');
