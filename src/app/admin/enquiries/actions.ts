@@ -25,6 +25,12 @@ async function requireAdmin() {
   return admin;
 }
 
+export async function signOutAdmin() {
+  const supabase = await createServerSupabaseClient();
+  if (supabase) await supabase.auth.signOut();
+  redirect('/portal/login?next=/admin/enquiries');
+}
+
 export async function updateEnquiryStatus(formData: FormData) {
   const enquiryId = String(formData.get('enquiryId') ?? '').trim();
   const status = String(formData.get('status') ?? '').trim() as EnquiryStatus;
