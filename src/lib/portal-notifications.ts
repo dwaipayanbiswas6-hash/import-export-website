@@ -22,7 +22,10 @@ function recipients() {
     .filter(Boolean);
 }
 
-export async function sendPortalAccessLink(email: string, next = '/portal') {
+export async function sendPortalAccessLink(
+  email: string,
+  next = '/admin/enquiries',
+) {
   const config = getSupabasePublicConfig();
   if (!config) return false;
 
@@ -44,7 +47,7 @@ export async function sendPortalAccessLink(email: string, next = '/portal') {
   });
 
   if (error) {
-    console.error('Could not send portal access link.', error.message);
+    console.error('Could not send administrator access link.', error.message);
     return false;
   }
 
@@ -92,28 +95,8 @@ export async function notifyAdminOfEnquiry(input: {
     from,
     to,
     reply_to: input.buyerEmail,
-    subject: `New portal enquiry ${input.reference} — ${input.companyName}`,
-    text: `A new ${input.category} enquiry has been saved in the Biswas Exports portal.\n\nReference: ${input.reference}\nBuyer: ${input.companyName}\nBusiness email: ${input.buyerEmail}\n\nOpen the admin inbox: ${adminUrl}`,
-    html: `<p>A new <strong>${escapeHtml(input.category)}</strong> enquiry has been saved in the Biswas Exports portal.</p><p><strong>Reference:</strong> ${escapeHtml(input.reference)}<br><strong>Buyer:</strong> ${escapeHtml(input.companyName)}<br><strong>Business email:</strong> ${escapeHtml(input.buyerEmail)}</p><p><a href="${adminUrl}">Open the admin inbox</a></p>`,
-  });
-}
-
-export async function notifyBuyerOfResponse(input: {
-  buyerEmail: string;
-  reference: string;
-}) {
-  const from = configured(process.env.CONTACT_FROM_EMAIL);
-  const replyTo =
-    configured(process.env.CONTACT_REPLY_TO_EMAIL) ?? recipients()[0] ?? null;
-  if (!from || !replyTo) return false;
-
-  const portalUrl = `${siteUrl}/portal`;
-  return sendResendEmail({
-    from,
-    to: [input.buyerEmail],
-    reply_to: replyTo,
-    subject: `New response available — ${input.reference}`,
-    text: `Biswas Exports has posted a response to enquiry ${input.reference}. Sign in with the same business email to view it: ${portalUrl}`,
-    html: `<p>Biswas Exports has posted a response to enquiry <strong>${escapeHtml(input.reference)}</strong>.</p><p><a href="${portalUrl}">Sign in to view the response</a></p>`,
+    subject: `New enquiry ${input.reference} — ${input.companyName}`,
+    text: `A new ${input.category} enquiry has been saved in the Biswas Exports admin inbox.\n\nReference: ${input.reference}\nBuyer: ${input.companyName}\nBusiness email: ${input.buyerEmail}\n\nOpen the admin inbox: ${adminUrl}`,
+    html: `<p>A new <strong>${escapeHtml(input.category)}</strong> enquiry has been saved in the Biswas Exports admin inbox.</p><p><strong>Reference:</strong> ${escapeHtml(input.reference)}<br><strong>Buyer:</strong> ${escapeHtml(input.companyName)}<br><strong>Business email:</strong> ${escapeHtml(input.buyerEmail)}</p><p><a href="${adminUrl}">Open the admin inbox</a></p>`,
   });
 }
