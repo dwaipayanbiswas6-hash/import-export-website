@@ -61,7 +61,7 @@ function AdminLoginForm() {
           <ul className="mt-8 grid gap-3 text-sm leading-6 text-[color:var(--muted)]">
             <li>• Review saved business enquiries and RFQ documents.</li>
             <li>• Update enquiry status and record internal progress.</li>
-            <li>• Reply directly to the buyer's business email.</li>
+            <li>• Reply directly to the buyer’s business email.</li>
           </ul>
         </section>
 
