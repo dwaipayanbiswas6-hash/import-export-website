@@ -1,11 +1,21 @@
 import type { Metadata } from 'next';
-import { ArrowRight, Inbox, LogOut, ShieldCheck } from 'lucide-react';
+import {
+  ArrowRight,
+  Inbox,
+  LogOut,
+  Search,
+  ShieldCheck,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { signOutAdmin } from './actions';
+import { AdminNavigation } from '@/components/admin-navigation';
 import {
+  enquiryStatuses,
   isPortalAdmin,
   statusLabel,
+  type EnquiryStatus,
   type PortalEnquiry,
 } from '@/lib/portal';
 import { createAdminSupabaseClient } from '@/lib/supabase/admin';
@@ -17,7 +27,15 @@ export const metadata: Metadata = {
 };
 export const dynamic = 'force-dynamic';
 
-export default async function AdminEnquiriesPage() {
+type Props = {
+  searchParams: Promise<{
+    q?: string;
+    status?: string;
+  }>;
+};
+
+export default async function AdminEnquiriesPage({ searchParams }: Props) {
+  const filters = await searchParams;
   const supabase = await createServerSupabaseClient();
   if (!supabase) {
     return (
@@ -51,10 +69,36 @@ export default async function AdminEnquiriesPage() {
   if (error) console.error('Admin inbox query failed.', error.message);
   const enquiries = (data ?? []) as PortalEnquiry[];
 
+  const query = (filters.q ?? '').trim().toLowerCase();
+  const requestedStatus = (filters.status ?? '').trim() as EnquiryStatus;
+  const selectedStatus = enquiryStatuses.includes(requestedStatus)
+    ? requestedStatus
+    : '';
+  const filteredEnquiries = enquiries.filter((enquiry) => {
+    const matchesStatus = !selectedStatus || enquiry.status === selectedStatus;
+    const matchesQuery =
+      !query ||
+      [
+        enquiry.reference,
+        enquiry.company_name,
+        enquiry.buyer_email,
+        enquiry.contact_person,
+        enquiry.product_category,
+        enquiry.product_requirement,
+        enquiry.destination,
+        enquiry.country,
+      ]
+        .join(' ')
+        .toLowerCase()
+        .includes(query);
+    return matchesStatus && matchesQuery;
+  });
+
   const activeCount = enquiries.filter(
     (enquiry) => !['won', 'closed'].includes(enquiry.status),
   ).length;
   const newCount = enquiries.filter((enquiry) => enquiry.status === 'new').length;
+  const filtersActive = Boolean(query || selectedStatus);
 
   return (
     <main className="mx-auto min-h-[70vh] max-w-7xl px-5 py-14 sm:px-6 sm:py-20 lg:px-8">
@@ -78,14 +122,69 @@ export default async function AdminEnquiriesPage() {
         </form>
       </div>
 
+      <AdminNavigation current="enquiries" />
+
       <section className="mt-8 grid gap-4 sm:grid-cols-3">
         <Metric label="Total enquiries" value={enquiries.length} />
         <Metric label="New enquiries" value={newCount} />
         <Metric label="Active enquiries" value={activeCount} />
       </section>
 
-      {enquiries.length ? (
-        <section className="mt-10 overflow-hidden rounded-[2rem] border border-[color:var(--line)] bg-white shadow-sm">
+      <form
+        className="mt-8 grid gap-4 rounded-[2rem] border border-[color:var(--line)] bg-[color:var(--cream)] p-5 shadow-sm md:grid-cols-[1fr_220px_auto] md:items-end"
+        method="get"
+      >
+        <label className="grid gap-2 text-sm font-semibold" htmlFor="q">
+          Search enquiries
+          <div className="relative">
+            <Search
+              aria-hidden="true"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-[color:var(--muted)]"
+              size={18}
+            />
+            <input
+              className="w-full rounded-2xl border border-[color:var(--line)] bg-white py-3 pl-11 pr-4 outline-none focus:border-[color:var(--gold)]"
+              defaultValue={filters.q ?? ''}
+              id="q"
+              name="q"
+              placeholder="Reference, company, buyer or product"
+            />
+          </div>
+        </label>
+        <label className="grid gap-2 text-sm font-semibold" htmlFor="status">
+          Status
+          <select
+            className="rounded-2xl border border-[color:var(--line)] bg-white px-4 py-3 outline-none focus:border-[color:var(--gold)]"
+            defaultValue={selectedStatus}
+            id="status"
+            name="status"
+          >
+            <option value="">All statuses</option>
+            {enquiryStatuses.map((status) => (
+              <option key={status} value={status}>
+                {statusLabel(status)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button className="button-primary min-h-12" type="submit">
+          <Search size={17} /> Apply filters
+        </button>
+      </form>
+
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm text-[color:var(--muted)]">
+        <p>
+          Showing {filteredEnquiries.length} of {enquiries.length} enquiries
+        </p>
+        {filtersActive && (
+          <Link className="gold-link" href="/admin/enquiries">
+            <X size={16} /> Clear filters
+          </Link>
+        )}
+      </div>
+
+      {filteredEnquiries.length ? (
+        <section className="mt-6 overflow-hidden rounded-[2rem] border border-[color:var(--line)] bg-white shadow-sm">
           <div className="hidden grid-cols-[1.1fr_1fr_.7fr_.55fr_auto] gap-4 border-b border-[color:var(--line)] bg-[color:var(--cream)] px-6 py-4 text-xs font-bold uppercase tracking-[.12em] text-[color:var(--muted)] lg:grid">
             <span>Buyer</span>
             <span>Requirement</span>
@@ -94,7 +193,7 @@ export default async function AdminEnquiriesPage() {
             <span>Open</span>
           </div>
           <div className="divide-y divide-[color:var(--line)]">
-            {enquiries.map((enquiry) => (
+            {filteredEnquiries.map((enquiry) => (
               <article
                 className="grid gap-4 px-6 py-6 lg:grid-cols-[1.1fr_1fr_.7fr_.55fr_auto] lg:items-center"
                 key={enquiry.id}
@@ -134,11 +233,15 @@ export default async function AdminEnquiriesPage() {
           </div>
         </section>
       ) : (
-        <section className="mt-10 rounded-[2rem] border border-dashed border-[color:var(--gold-soft)] bg-[color:var(--cream)] p-10 text-center">
+        <section className="mt-6 rounded-[2rem] border border-dashed border-[color:var(--gold-soft)] bg-[color:var(--cream)] p-10 text-center">
           <Inbox className="mx-auto text-[color:var(--gold)]" size={38} />
-          <h2 className="mt-5 text-3xl font-semibold">No enquiries yet</h2>
+          <h2 className="mt-5 text-3xl font-semibold">
+            {filtersActive ? 'No matching enquiries' : 'No enquiries yet'}
+          </h2>
           <p className="mt-3 text-[color:var(--muted)]">
-            New form submissions will appear here after they are saved.
+            {filtersActive
+              ? 'Try a broader search or clear the selected status.'
+              : 'New form submissions will appear here after they are saved.'}
           </p>
         </section>
       )}
