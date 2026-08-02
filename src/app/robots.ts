@@ -1,11 +1,22 @@
 import type { MetadataRoute } from 'next';
+import { allowIndexing, siteUrl } from '@/lib/site';
 
 export default function robots(): MetadataRoute.Robots {
+  if (!allowIndexing) {
+    return {
+      rules: {
+        userAgent: '*',
+        disallow: '/',
+      },
+    };
+  }
+
   return {
     rules: {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://biswasexports.com/sitemap.xml',
+    sitemap: `${siteUrl}/sitemap.xml`,
+    host: siteUrl,
   };
 }

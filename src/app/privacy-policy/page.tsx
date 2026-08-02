@@ -14,7 +14,7 @@ export default function Page() {
       />
       <section className="mx-auto max-w-4xl px-5 py-16 sm:px-6 sm:py-20 lg:px-8">
         <div className="premium-card prose-card leading-8 text-[color:var(--muted)]">
-          <p className="text-sm">Last updated: 31 July 2026</p>
+          <p className="text-sm">Last updated: 1 August 2026</p>
 
           <h2>Information you provide</h2>
           <p>
@@ -22,51 +22,62 @@ export default function Page() {
             enquiry form or direct business communication. This can include your
             name, job title, company name, business email, phone number, country,
             website, product requirement, specifications, quantity, destination,
-            timeline, preferred trade term, notes and an optional uploaded RFQ
-            or specification file.
+            timeline, preferred trade term, notes and uploaded RFQ or
+            specification files.
+          </p>
+
+          <h2>Enquiry records</h2>
+          <p>
+            Enquiries, status changes, timestamps and authorised attachments may
+            be stored as business records so that Biswas Exports can review the
+            request, coordinate follow-up and maintain an auditable enquiry
+            history. Responses are sent directly to the business email supplied
+            by the buyer.
           </p>
 
           <h2>Technical and security information</h2>
           <p>
-            Website hosting and security systems may process limited technical
-            information such as an IP address, request time, browser or device
-            information, requested page and security events. This information
-            may be used to operate the website, prevent misuse, investigate
-            errors and enforce submission limits.
+            Website hosting, database, storage and security systems may process
+            limited technical information such as an IP address, request time,
+            browser or device information, requested page and security event.
+            This information may be used to operate the website, prevent misuse,
+            investigate errors and enforce submission limits.
           </p>
 
           <h2>How information is used</h2>
           <p>
-            Information may be used to review and respond to an enquiry, verify
-            business context, communicate about requested products or services,
-            coordinate an accepted engagement, maintain records, protect the
-            website and meet applicable legal or contractual obligations.
+            Information may be used to save, review and respond to an enquiry,
+            verify business context, communicate about requested products or
+            services, coordinate an accepted engagement, maintain records,
+            protect the website and meet applicable legal or contractual
+            obligations.
           </p>
 
           <h2>Files and sensitive information</h2>
           <p>
             Do not upload passwords, payment-card data, government identity
-            documents, medical records or other unnecessary sensitive personal
-            information. Uploaded files should contain only information needed
-            for the business enquiry.
+            documents, medical records, trade secrets unrelated to the enquiry
+            or other unnecessary sensitive personal information. Uploaded files
+            should contain only information needed for the business enquiry.
           </p>
 
           <h2>Service providers and sharing</h2>
           <p>
             We do not sell personal information. Information may be processed by
-            service providers used for website hosting, security, email delivery
-            and technical operations. It may also be shared with potential
-            suppliers, laboratories, inspection providers, logistics providers
-            or professional advisers only where reasonably necessary for an
-            enquiry or agreed engagement and subject to appropriate review.
+            service providers used for website hosting, database storage,
+            private file storage, security, email delivery and technical
+            operations. It may also be shared with potential suppliers,
+            laboratories, inspection providers, logistics providers or
+            professional advisers only where reasonably necessary for an enquiry
+            or agreed engagement and subject to appropriate review.
           </p>
 
           <h2>International processing</h2>
           <p>
-            Because website and email service providers may operate in multiple
-            countries, information may be processed outside your country. The
-            location and safeguards can depend on the providers and services in
-            use at the relevant time.
+            Because website, database, storage and email service providers may
+            operate in multiple countries, information may be processed outside
+            your country. The location and safeguards can depend on the providers
+            and services in use at the relevant time.
           </p>
 
           <h2>Retention</h2>
@@ -79,8 +90,9 @@ export default function Page() {
 
           <h2>Security</h2>
           <p>
-            Reasonable technical and organisational measures may be used to
-            protect information, but no online transmission, email system or
+            Reasonable technical and organisational measures may be used,
+            including restricted administrator access, private storage and
+            short-lived file links. No online transmission, email system or
             storage method can be guaranteed completely secure.
           </p>
 
@@ -88,8 +100,9 @@ export default function Page() {
           <p>
             You may ask about information you submitted or request an
             appropriate correction or deletion. A request may require identity
-            or business verification and may be limited where retention is
-            reasonably necessary for legal, security or record-keeping purposes.
+            and business-email verification and may be limited where retention
+            is reasonably necessary for legal, security, dispute or
+            record-keeping purposes.
           </p>
 
           <h2>Policy changes</h2>
